@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #171717;
+  --background: #ffffff;
+  --primary: #1e40af;
+  --primary-light: #3b82f6;
+  --primary-dark: #1e3a8a;
+  --secondary: #059669;
+  --accent: #f59e0b;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --card-bg: #f9fafb;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.chat-bubble-user {
+  @apply bg-blue-600 text-white rounded-2xl rounded-br-sm px-4 py-3 max-w-[80%] ml-auto;
+}
+
+.chat-bubble-agent {
+  @apply bg-gray-100 text-gray-900 rounded-2xl rounded-bl-sm px-4 py-3 max-w-[80%];
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-white hover:bg-gray-50 text-blue-600 font-semibold py-2.5 px-6 rounded-lg border-2 border-blue-600 transition-colors duration-200;
+}
+
+.input-field {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200;
+}

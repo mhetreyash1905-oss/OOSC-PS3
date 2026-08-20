@@ -1,0 +1,50 @@
+'use client';
+
+import { getToken, removeToken } from './auth';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+interface ApiOptions {
+  method?: string;
+  body?: unknown;
+  headers?: Record<string, string>;
+}
+
+export async function apiFetch<T = unknown>(endpoint: string, options: ApiOptions = {}): Promise<T> {
+  const token = getToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    method: options.method || 'GET',
+    headers,
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  if (response.status === 401) {
+    removeToken();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+    throw new Error('Authentication expired. Please log in again.');
+  }
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || `API error: ${response.status}`);
+  }
+
+  // Handle PDF/blob responses
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/pdf')) {
+    return response.blob() as unknown as T;
+  }
+
+  return response.json();
+}
