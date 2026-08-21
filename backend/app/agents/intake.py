@@ -8,8 +8,9 @@ from typing import Optional, List
 
 logger = logging.getLogger(__name__)
 
-# Initialize the client. It will automatically pick up GEMINI_API_KEY from the environment.
-client = genai.Client()
+from app.config import GEMINI_API_KEY
+# Initialize the client.
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 class IntakeResponse(BaseModel):
     is_complete: bool = Field(description="True if you have gathered enough information to classify the issue and extract all required fields. False if you still need to ask a clarifying question.")

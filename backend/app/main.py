@@ -33,7 +33,7 @@ async def startup_event():
         logger.info("Successfully connected to MongoDB.")
     except Exception as e:
         logger.error(f"Failed to connect to MongoDB on startup: {e}")
-        # Not raising to allow app to start, though it will fail DB calls
+        raise e
 
 @app.get("/")
 async def health_check():
