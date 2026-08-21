@@ -16,6 +16,60 @@ class IntakeRequest(BaseModel):
 class SessionRequest(BaseModel):
     session_id: str
 
+@router.get("/sessions/history")
+async def get_session_history(current_user: dict = Depends(get_current_user)):
+    """Return the user's past sessions for the sidebar history list."""
+    cursor = sessions_collection.find(
+        {"user_id": current_user["user_id"]},
+        {"intake_history": 1, "status": 1, "created_at": 1, "intake": 1}
+    ).sort("created_at", -1).limit(30)
+    
+    sessions = []
+    async for session in cursor:
+        # Build a short title from the first user message or intake category
+        title = "New Chat"
+        history = session.get("intake_history", [])
+        for msg in history:
+            if msg.get("role") == "user":
+                title = msg["content"][:60]
+                break
+        
+        intake = session.get("intake")
+        if intake and intake.get("category"):
+            category = intake["category"].replace("_", " ").title()
+        else:
+            category = None
+
+        if title != "New Chat":
+            sessions.append({
+                "session_id": str(session["_id"]),
+                "title": title,
+                "category": category,
+                "status": session.get("status", "intake"),
+                "created_at": session.get("created_at", "").isoformat() if session.get("created_at") else None,
+            })
+    
+    return {"sessions": sessions}
+
+@router.get("/sessions/{session_id_str}")
+async def get_session(session_id_str: str, current_user: dict = Depends(get_current_user)):
+    try:
+        session_id = ObjectId(session_id_str)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid session_id format")
+
+    session = await sessions_collection.find_one({"_id": session_id, "user_id": current_user["user_id"]})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+        
+    session["session_id"] = str(session["_id"])
+    session.pop("_id")
+    session.pop("user_id")
+    if "created_at" in session and session["created_at"]:
+        session["created_at"] = session["created_at"].isoformat()
+        
+    return session
+
 @router.post("/session/start")
 async def start_session(current_user: dict = Depends(get_current_user)):
     session_doc = {
