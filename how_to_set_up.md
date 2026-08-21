@@ -49,9 +49,10 @@ The backend powers the AI, MongoDB database connections, and authentication.
    Create a new file named `.env` in the `backend` directory (`backend/.env`). Add the following keys to it and fill in the values:
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
-   JWT_SECRET=a_secure_random_jwt_secret_key
+   JWT_SECRET=your_secure_random_hex_string
    MONGODB_URI=your_mongodb_connection_string
    ```
+   *(To generate a secure `JWT_SECRET`, you can run `python -c "import secrets; print(secrets.token_hex(32))"` in your terminal).*
    *⚠️ **Important MongoDB Note**: Ensure that your current IP address is whitelisted in your MongoDB Atlas network access settings, otherwise the backend will fail to connect during startup!*
 
 6. **Start the Backend Server:**
