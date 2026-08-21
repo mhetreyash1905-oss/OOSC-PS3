@@ -1,3 +1,6 @@
+pleaseee kaa krdenaaa!!
+
+
 # Complete Project Setup Guide
 
 Welcome to the **Civic Rights Navigator** project! Follow these instructions step-by-step to get the application fully up and running on your local machine after cloning the repository.
