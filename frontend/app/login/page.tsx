@@ -36,7 +36,7 @@ export default function LoginPage() {
       });
       
       setToken(data.access_token);
-      router.push('/platform');
+      window.location.href = '/platform';
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
     } finally {

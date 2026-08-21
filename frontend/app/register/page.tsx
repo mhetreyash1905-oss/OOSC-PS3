@@ -9,6 +9,9 @@ import { setToken, isAuthenticated } from '@/lib/auth';
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [gender, setGender] = useState('prefer-not-to-say');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,7 +26,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword || !firstName || !lastName) {
       setError('Please fill in all fields');
       return;
     }
@@ -44,11 +47,18 @@ export default function RegisterPage() {
     try {
       const data = await apiFetch<{ access_token: string }>('/auth/register', {
         method: 'POST',
-        body: { email, password, confirm_password: confirmPassword }
+        body: { 
+          email, 
+          password, 
+          confirm_password: confirmPassword,
+          first_name: firstName,
+          last_name: lastName,
+          gender
+        }
       });
       
       setToken(data.access_token);
-      router.push('/platform');
+      window.location.href = '/platform';
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -74,6 +84,50 @@ export default function RegisterPage() {
             </div>
           )}
           <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="firstName" className="sr-only">First Name</label>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  required
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="input-field"
+                  placeholder="First Name"
+                />
+              </div>
+              <div>
+                <label htmlFor="lastName" className="sr-only">Last Name</label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  required
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="input-field"
+                  placeholder="Last Name"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="gender" className="sr-only">Gender</label>
+              <select
+                id="gender"
+                name="gender"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="input-field bg-white"
+              >
+                <option value="prefer-not-to-say">Prefer not to say</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non-binary">Non-binary</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
             <div>
               <label htmlFor="email-address" className="sr-only">Email address</label>
               <input

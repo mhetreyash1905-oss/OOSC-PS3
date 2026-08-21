@@ -5,7 +5,10 @@ import Link from 'next/link';
 import { isAuthenticated, getUserEmail, logout } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
 
+import { usePathname } from 'next/navigation';
+
 export default function Navbar() {
+  const pathname = usePathname();
   const [isAuth, setIsAuth] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,7 +17,7 @@ export default function Navbar() {
   useEffect(() => {
     setIsAuth(isAuthenticated());
     setEmail(getUserEmail());
-  }, []);
+  }, [pathname]);
 
   const handleLogout = () => {
     logout();
@@ -64,7 +67,7 @@ export default function Navbar() {
                       <p className="text-sm leading-5 text-gray-900 dark:text-gray-200 font-medium truncate">{email}</p>
                     </div>
                     <div className="py-1">
-                      <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#3d3a3a]">Your Profile</Link>
+                      <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#3d3a3a]">Settings</Link>
                       <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-[#3d3a3a]">Logout</button>
                     </div>
                   </div>
@@ -118,6 +121,7 @@ export default function Navbar() {
             {isAuth ? (
               <div className="px-5 space-y-3">
                 <div className="text-base font-medium text-gray-800 dark:text-gray-200">{email}</div>
+                <Link href="/settings" className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2d2a2a]">Settings</Link>
                 <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2d2a2a]">Logout</button>
               </div>
             ) : (

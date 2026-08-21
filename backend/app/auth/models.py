@@ -6,6 +6,9 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     confirm_password: str
+    first_name: str
+    last_name: str
+    gender: str
 
     @model_validator(mode='after')
     def check_passwords_match(self):
@@ -28,3 +31,10 @@ class UserInDB(BaseModel):
     id: str
     email: str
     created_at: datetime
+
+class UserUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    gender: Optional[str] = None
+    bio: Optional[str] = None
+    avatar: Optional[str] = None
