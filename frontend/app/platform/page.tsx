@@ -517,6 +517,21 @@ export default function PlatformPage() {
           </button>
         )}
 
+        {/* Persistent Escalate to Human / Legal Aid Pathway */}
+        <div className="absolute top-4 right-4 z-20">
+          <a
+            href="https://nalsa.gov.in/lsams/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#232121] text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all hover:scale-105"
+            title="National Legal Services Authority Helpline - For Low Confidence or Out-of-Scope cases"
+          >
+            <span className="text-base">🧑‍⚖️</span>
+            <span className="hidden sm:inline">Connect with Legal Aid (DLSA)</span>
+            <span className="sm:hidden">Legal Aid</span>
+          </a>
+        </div>
+
         {isLandingView ? (
           /* Landing / Hero State (ChatGPT style) */
           <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-8 overflow-y-auto">
@@ -776,14 +791,25 @@ export default function PlatformPage() {
 
                         {/* Create Action Plan Button (triggers step 2) */}
                         {step === 1 && (
-                          <div className="pt-2 flex justify-start">
+                          <div className="pt-2 flex flex-wrap justify-start gap-3 mt-1">
                             <button
                               onClick={handleCreateActionPlan}
-                              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all hover:translate-x-0.5"
+                              className="inline-flex items-center gap-2 bg-[#0e6670] hover:bg-[#084951] dark:bg-[#78c4c2] dark:hover:bg-[#5bb2b0] dark:text-[#102a2e] text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all hover:translate-x-0.5"
                             >
                               <span>Create Action Plan</span>
                               <span>→</span>
                             </button>
+                            
+                            {/* Escalate to Human Pathway */}
+                            <a
+                              href="https://nalsa.gov.in/lsams/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 bg-gray-50 dark:bg-[#2d2a2a] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-gray-700 dark:text-gray-300 hover:text-rose-700 dark:hover:text-rose-400 border border-gray-200 dark:border-[#444] hover:border-rose-300 dark:hover:border-rose-900/60 font-semibold text-sm px-5 py-2.5 rounded-xl transition-all shadow-sm"
+                              title="District Legal Services Authority / NALSA Helpline"
+                            >
+                              <span>🧑‍⚖️ Connect with Legal Aid (DLSA)</span>
+                            </a>
                           </div>
                         )}
                       </div>
