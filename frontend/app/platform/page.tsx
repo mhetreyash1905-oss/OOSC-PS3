@@ -320,6 +320,35 @@ export default function PlatformPage() {
     }
   };
 
+  const downloadSummary = async () => {
+    if (!sessionId) return;
+    setIsDownloading(true);
+    setErrorMsg(null);
+    try {
+      const token = await getIdToken();
+      const response = await fetch(`http://localhost:8000/platform/download-summary/${sessionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Download failed');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Case_Summary_${sessionId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setErrorMsg('Failed to download Case Summary.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const downloadPDF = async () => {
     if (!sessionId) return;
     setIsDownloading(true);
@@ -534,8 +563,22 @@ export default function PlatformPage() {
           </button>
         )}
 
-        {/* Persistent Escalate to Human / Legal Aid Pathway */}
-        <div className="absolute top-4 right-4 z-20">
+        {/* Top Right Actions */}
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-3">
+          {step > 1 && (
+            <button
+              onClick={downloadSummary}
+              disabled={isDownloading}
+              className="inline-flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#232121] text-blue-700 dark:text-[#78c4c2] border border-blue-200 dark:border-[#333] rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:bg-blue-50 dark:hover:bg-[#2d2a2a] transition-all hover:scale-105 disabled:opacity-50"
+              title="Export a 1-page PDF summary of your case"
+            >
+              <span className="text-base">📄</span>
+              <span className="hidden sm:inline">{isDownloading ? 'Exporting...' : 'Export Case Summary'}</span>
+              <span className="sm:hidden">Export</span>
+            </button>
+          )}
+
+          {/* Persistent Escalate to Human / Legal Aid Pathway */}
           <a
             href="https://nalsa.gov.in/lsams/"
             target="_blank"

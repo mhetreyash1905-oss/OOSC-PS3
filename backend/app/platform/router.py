@@ -292,6 +292,28 @@ async def draft_rti(request: SessionRequest, current_user: dict = Depends(get_cu
     
     return session["rti_document"]
 
+@router.get("/download-summary/{session_id_str}")
+async def download_summary(session_id_str: str, current_user: dict = Depends(get_current_user)):
+    try:
+        session_id = ObjectId(session_id_str)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid session_id format")
+
+    session = await sessions_collection.find_one({"_id": session_id, "user_id": current_user["user_id"]})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    from app.pdf.generator import generate_case_summary_pdf
+    pdf_bytes = generate_case_summary_pdf(session)
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename=Case_Summary_{session_id_str}.pdf"
+        }
+    )
+
 @router.get("/download-rti/{session_id_str}")
 async def download_rti(session_id_str: str, current_user: dict = Depends(get_current_user)):
     try:
