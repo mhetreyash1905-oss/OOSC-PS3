@@ -6,7 +6,6 @@ export default function ResourcesPage() {
   const resourceCategories = [
     {
       title: 'Tenancy & Rental Law Resources',
-      icon: '🏠',
       items: [
         {
           name: 'Maharashtra Rent Control Act 1999',
@@ -27,7 +26,6 @@ export default function ResourcesPage() {
     },
     {
       title: 'RTI (Right to Information) Resources',
-      icon: '📜',
       items: [
         {
           name: 'RTI Act 2005 Official Citizen Handbook',
@@ -48,7 +46,6 @@ export default function ResourcesPage() {
     },
     {
       title: 'Municipal & Grievance Redressal',
-      icon: '🏛️',
       items: [
         {
           name: 'Municipal Corporation Grievance Escalation Matrix',
@@ -64,7 +61,6 @@ export default function ResourcesPage() {
     },
     {
       title: 'Consumer & Digital Rights',
-      icon: '🛒',
       items: [
         {
           name: 'Consumer Protection Act 2019',
@@ -85,7 +81,6 @@ export default function ResourcesPage() {
     },
     {
       title: 'Labor, Healthcare & Education',
-      icon: '💼',
       items: [
         {
           name: 'Labour & Employment Laws',
@@ -106,7 +101,6 @@ export default function ResourcesPage() {
     },
     {
       title: 'Social Welfare & Public Services',
-      icon: '🏛️',
       items: [
         {
           name: 'Right to Public Services Legislation',
@@ -133,7 +127,6 @@ export default function ResourcesPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-[#252323] text-blue-700 dark:text-[#e7b85b] text-xs font-bold border border-blue-100 dark:border-[#383535]">
-            <span>📚</span>
             <span>Civic Knowledge Library</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
@@ -149,7 +142,6 @@ export default function ResourcesPage() {
           {resourceCategories.map((cat, idx) => (
             <div key={idx} className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{cat.icon}</span>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{cat.title}</h2>
               </div>
 
