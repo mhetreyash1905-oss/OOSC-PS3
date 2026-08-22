@@ -1,0 +1,228 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+
+export default function ApplicationGeneratorPage() {
+  const [docType, setDocType] = useState<'rti' | 'landlord_notice' | 'municipal'>('rti');
+  
+  // Form State
+  const [applicantName, setApplicantName] = useState('Ramesh Kumar');
+  const [address, setAddress] = useState('Flat 402, Sunshine Apartments, MG Road, Mumbai, Maharashtra 400001');
+  const [authority, setAuthority] = useState('Public Information Officer, Brihanmumbai Municipal Corporation (BMC)');
+  const [subject, setSubject] = useState('Application under Section 6(1) of RTI Act 2005 regarding Road Tender Expenditure');
+  const [particulars, setParticulars] = useState('1. Certified copy of work order for road repair on MG Road.\n2. Certified copy of quality test report for asphalt thickness.\n3. Total expenditure incurred and contractor details.');
+
+  const [generating, setGenerating] = useState(false);
+
+  const handleApplyPreset = (type: 'rti' | 'landlord_notice' | 'municipal') => {
+    setDocType(type);
+    if (type === 'rti') {
+      setAuthority('Public Information Officer, Brihanmumbai Municipal Corporation (BMC)');
+      setSubject('Application under Section 6(1) of RTI Act 2005 regarding Road Repair & Tender Expenditure');
+      setParticulars('1. Certified copy of work order & sanctioned budget for MG Road repair.\n2. Copy of quality inspection certificate.\n3. Defect liability period and contractor warranty details.');
+    } else if (type === 'landlord_notice') {
+      setAuthority('To Landlord: Mr. Suresh Mehta, Flat 101, Bandra West, Mumbai');
+      setSubject('Legal Demand Notice for Refund of Security Deposit under Rent Control Act');
+      setParticulars('I hereby demand refund of my security deposit of ₹75,000 within 15 days of receipt of this notice. The lease ended on 31st July 2026 and premises were handed over in good condition.');
+    } else if (type === 'municipal') {
+      setAuthority('To: Executive Engineer / Ward Officer, Ward H-West, Municipal Corporation');
+      setSubject('Formal Complaint & Notice regarding Contaminated Water Supply & Sewage Line Leakage');
+      setParticulars('We write to bring to your urgent attention severe sewage contamination in municipal drinking water pipeline causing public health hazards. Immediate site inspection and pipe repair required within 7 days.');
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    setGenerating(true);
+    setTimeout(() => {
+      // Simulate client PDF download window
+      window.print();
+      setGenerating(false);
+    }, 600);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#151414] text-gray-900 dark:text-gray-100 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+      <div className="max-w-6xl mx-auto space-y-10">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-[#333] pb-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-[#252323] text-blue-700 dark:text-[#e7b85b] text-xs font-bold mb-2">
+              <span>📄</span>
+              <span>Official Document Engine</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+              Application & RTI Generator
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Format statutory Section 6(1) RTI applications, Landlord Demand Notices, and Municipal Petitions ready for submission.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleApplyPreset('rti')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${docType === 'rti' ? 'bg-[#0e6670] text-white' : 'bg-gray-100 dark:bg-[#2d2a2a] text-gray-700 dark:text-gray-300'}`}
+            >
+              📜 RTI App
+            </button>
+            <button
+              onClick={() => handleApplyPreset('landlord_notice')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${docType === 'landlord_notice' ? 'bg-[#0e6670] text-white' : 'bg-gray-100 dark:bg-[#2d2a2a] text-gray-700 dark:text-gray-300'}`}
+            >
+              🏠 Deposit Notice
+            </button>
+            <button
+              onClick={() => handleApplyPreset('municipal')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${docType === 'municipal' ? 'bg-[#0e6670] text-white' : 'bg-gray-100 dark:bg-[#2d2a2a] text-gray-700 dark:text-gray-300'}`}
+            >
+              🏛️ Civic Petition
+            </button>
+          </div>
+        </div>
+
+        {/* Generator Main Grid: Form Left, Preview Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Form Side */}
+          <div className="bg-white dark:bg-[#201e1e] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-sm space-y-5">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Configure Details</h2>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Document Type
+              </label>
+              <select
+                value={docType}
+                onChange={(e) => handleApplyPreset(e.target.value as any)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
+              >
+                <option value="rti">RTI Application (Section 6(1) RTI Act 2005)</option>
+                <option value="landlord_notice">Landlord Security Deposit Demand Notice</option>
+                <option value="municipal">Municipal Civic Grievance Petition</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Applicant Name
+              </label>
+              <input
+                type="text"
+                value={applicantName}
+                onChange={(e) => setApplicantName(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Applicant Address & Contact
+              </label>
+              <textarea
+                rows={2}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670] resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Target Authority / Addressee
+              </label>
+              <input
+                type="text"
+                value={authority}
+                onChange={(e) => setAuthority(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Subject Heading
+              </label>
+              <input
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Particulars / Information Sought / Demand Clause
+              </label>
+              <textarea
+                rows={5}
+                value={particulars}
+                onChange={(e) => setParticulars(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
+              />
+            </div>
+
+            <button
+              onClick={handleDownloadPDF}
+              disabled={generating}
+              className="w-full bg-[#0e6670] hover:bg-[#094d54] text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
+            >
+              <span>⬇️</span>
+              <span>{generating ? 'Generating PDF...' : 'Download Official PDF Document'}</span>
+            </button>
+          </div>
+
+          {/* Live Document Preview Side */}
+          <div className="bg-gray-100 dark:bg-[#1a1919] p-6 rounded-3xl border border-gray-200 dark:border-[#333] flex flex-col">
+            <div className="flex items-center justify-between mb-4 px-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Live PDF Document Preview</span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 font-semibold">
+                Formatted Section 6(1)
+              </span>
+            </div>
+
+            {/* Simulated Paper */}
+            <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg border border-gray-300 font-serif text-sm leading-relaxed space-y-4 flex-1">
+              <div className="text-center font-bold uppercase text-base border-b pb-3 tracking-wide">
+                {docType === 'rti' ? 'FORMAL APPLICATION UNDER RIGHT TO INFORMATION ACT 2005' : docType === 'landlord_notice' ? 'LEGAL DEMAND NOTICE FOR SECURITY DEPOSIT REFUND' : 'MUNICIPAL CIVIC PETITION'}
+              </div>
+
+              <div className="text-xs space-y-1">
+                <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+                <p><strong>From:</strong> {applicantName}</p>
+                <p><strong>Address:</strong> {address}</p>
+              </div>
+
+              <div className="text-xs pt-2">
+                <p><strong>To:</strong></p>
+                <p className="font-semibold">{authority}</p>
+              </div>
+
+              <div className="text-xs font-bold pt-2 border-t border-b py-2">
+                SUBJECT: {subject}
+              </div>
+
+              <div className="text-xs space-y-2 pt-2">
+                <p>Respected Authority / Sir,</p>
+                <p>I am a citizen of India and hereby request the following information / action under the statutory provisions applicable:</p>
+                <div className="bg-gray-50 p-3 rounded border font-mono text-[11px] whitespace-pre-wrap">
+                  {particulars}
+                </div>
+              </div>
+
+              <div className="text-xs pt-6 flex justify-between items-end">
+                <div>
+                  <p><strong>Application Fee:</strong> ₹10 Paid</p>
+                  <p><strong>Mode:</strong> IPO / Court Fee Stamp</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold">{applicantName}</p>
+                  <p className="text-[10px] text-gray-500">(Signature of Applicant)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

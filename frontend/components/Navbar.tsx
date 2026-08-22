@@ -11,6 +11,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isToolsOpen, setIsToolsOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   const isAuth = user !== null;
@@ -20,11 +21,19 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
+    { href: '/action-plan', label: 'Action Plan' },
+    { href: '/application-generator', label: 'App Generator' },
+    { href: '/rights-navigator', label: 'Rights Navigator' },
     { href: '/about', label: 'About' },
-    { href: '/rti-guide', label: 'RTI Guide' },
-    { href: '/resources', label: 'Resources' },
-    { href: '/faq', label: 'FAQ' },
-    { href: '/contact', label: 'Contact' },
+  ];
+
+  const toolLinks = [
+    { href: '/document-analyzer', label: '🔍 Document Analyzer', desc: 'AI Risk & Clause Extraction' },
+    { href: '/scheme-eligibility', label: '📋 Scheme Eligibility', desc: 'Check PMAY, Ayushman & RTI' },
+    { href: '/authority-finder', label: '🏛️ Authority Finder', desc: 'Locate PIO & Ward Officers' },
+    { href: '/rti-guide', label: '📜 RTI Guide', desc: 'Section 6(1) Citizen Manual' },
+    { href: '/resources', label: '📚 Civic Resources', desc: 'Templates & Manuals' },
+    { href: '/faq', label: '❓ FAQ', desc: 'Frequently Asked Questions' },
   ];
 
   return (
@@ -38,6 +47,7 @@ export default function Navbar() {
               </div>
               <span className="font-bold text-lg sm:text-xl tracking-tight text-[#0e6670] dark:text-[#78c4c2]">CivicSaathi</span>
             </Link>
+
             <div className="hidden lg:ml-8 lg:flex lg:items-center lg:gap-1">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
@@ -45,7 +55,7 @@ export default function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    className={`px-3 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors ${
                       isActive
                         ? 'text-[#0e6670] bg-[#dcefeb] dark:text-[#78c4c2] dark:bg-[#2c3d3e]'
                         : 'text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1] dark:hover:bg-[#2d2a2a]'
@@ -55,10 +65,34 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+
+              {/* Tools Dropdown */}
+              <div className="relative group">
+                <button
+                  onClick={() => setIsToolsOpen(!isToolsOpen)}
+                  className="px-3 py-2 rounded-lg text-xs xl:text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1] dark:hover:bg-[#2d2a2a] flex items-center gap-1"
+                >
+                  <span>More Tools</span>
+                  <span className="text-xs">▾</span>
+                </button>
+                <div className="absolute left-0 mt-1 w-64 bg-white dark:bg-[#201e1e] rounded-2xl shadow-xl border border-gray-100 dark:border-[#333] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2 z-50">
+                  {toolLinks.map((t) => (
+                    <Link
+                      key={t.href}
+                      href={t.href}
+                      className="block p-2.5 rounded-xl hover:bg-blue-50/60 dark:hover:bg-[#2d2a2a] transition-colors"
+                    >
+                      <div className="text-xs font-bold text-gray-900 dark:text-white">{t.label}</div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400">{t.desc}</div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
               {isAuth && (
                 <Link
                   href="/platform"
-                  className={`px-3.5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-1.5 ${
+                  className={`ml-2 px-3.5 py-2 rounded-lg text-xs xl:text-sm font-bold transition-all flex items-center gap-1.5 ${
                     pathname === '/platform'
                       ? 'text-white bg-[#0e6670] shadow-sm'
                       : 'text-[#0e6670] dark:text-[#e7b85b] bg-[#e7f4f1] dark:bg-[#2d2a2a] hover:bg-[#0e6670] hover:text-white'
@@ -70,6 +104,7 @@ export default function Navbar() {
               )}
             </div>
           </div>
+
           <div className="hidden lg:flex items-center space-x-3">
             {/* Theme Toggle */}
             <button
@@ -98,6 +133,7 @@ export default function Navbar() {
                     <Link href="/platform" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">AI Civic Assistant</Link>
                     <Link href="/cases" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">My Cases</Link>
                     <Link href="/saved-documents" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">Saved Documents</Link>
+                    <Link href="/applications" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">Applications</Link>
                     <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">Settings</Link>
                     <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-[#3d3a3a]">Logout</button>
                   </div>
@@ -152,6 +188,16 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          {toolLinks.map((tool) => (
+            <Link
+              key={tool.href}
+              href={tool.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2d2a2a]"
+            >
+              {tool.label}
+            </Link>
+          ))}
           {isAuth && (
             <Link
               href="/platform"
@@ -161,21 +207,6 @@ export default function Navbar() {
               🤖 AI Civic Assistant
             </Link>
           )}
-          <div className="pt-4 border-t border-gray-200 dark:border-[#333]">
-            {isAuth ? (
-              <div className="space-y-2">
-                <div className="text-xs text-gray-500 dark:text-gray-400 px-3">{email}</div>
-                <Link href="/cases" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300">My Cases</Link>
-                <Link href="/saved-documents" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300">Saved Documents</Link>
-                <button onClick={handleLogout} className="block w-full text-left px-3 py-1.5 text-sm text-red-600 dark:text-red-400">Logout</button>
-              </div>
-            ) : (
-              <div className="flex gap-2 pt-2">
-                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 text-center border border-gray-300 dark:border-[#444] text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm font-semibold">Login</Link>
-                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 text-center bg-[#0e6670] text-white py-2 rounded-lg text-sm font-semibold">Register</Link>
-              </div>
-            )}
-          </div>
         </div>
       )}
     </nav>

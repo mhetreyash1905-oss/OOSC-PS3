@@ -22,69 +22,69 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Col 2: Legal Tools */}
+          {/* Col 2: Core Platform Pages */}
           <div>
             <h4 className="text-xs font-semibold text-[#e7b85b] uppercase tracking-wider mb-4">
-              Civic & Legal Tools
+              CivicSaathi Platform
             </h4>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/platform" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>🤖</span> AI Civic Assistant
+                  <span>🤖</span> AI Assistant
                 </Link>
               </li>
               <li>
-                <Link href="/rti-guide" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>📜</span> RTI Drafting Guide
+                <Link href="/action-plan" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>⚡</span> Action Plan Builder
                 </Link>
               </li>
               <li>
-                <Link href="/resources" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>📚</span> Civic Resources Library
+                <Link href="/application-generator" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>📄</span> Application Generator
+                </Link>
+              </li>
+              <li>
+                <Link href="/rights-navigator" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>⚖️</span> Rights Navigator
                 </Link>
               </li>
               <li>
                 <Link href="/cases" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>🗂️</span> Case Tracker
-                </Link>
-              </li>
-              <li>
-                <Link href="/saved-documents" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>📁</span> Saved Documents & Drafts
+                  <span>🗂️</span> My Cases Tracker
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Knowledge & Guides */}
+          {/* Col 3: Smart Tools */}
           <div>
             <h4 className="text-xs font-semibold text-[#e7b85b] uppercase tracking-wider mb-4">
-              Knowledge Base
+              Specialized Tools
             </h4>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  About CivicSaathi
+                <Link href="/document-analyzer" className="hover:text-white transition-colors">
+                  🔍 Document Analyzer
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="hover:text-white transition-colors">
-                  Frequently Asked Questions
+                <Link href="/scheme-eligibility" className="hover:text-white transition-colors">
+                  📋 Scheme Eligibility
                 </Link>
               </li>
               <li>
-                <Link href="/resources" className="hover:text-white transition-colors">
-                  Tenancy Rights Manual
+                <Link href="/authority-finder" className="hover:text-white transition-colors">
+                  🏛️ Authority Finder
                 </Link>
               </li>
               <li>
-                <Link href="/resources" className="hover:text-white transition-colors">
-                  Municipal Grievance Escalation
+                <Link href="/rti-guide" className="hover:text-white transition-colors">
+                  📜 RTI Citizen Manual
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
-                  Contact & Citizen Support
+                <Link href="/saved-documents" className="hover:text-white transition-colors">
+                  📁 Saved Documents
                 </Link>
               </li>
             </ul>
@@ -102,11 +102,11 @@ export default function Footer() {
               </li>
               <li className="p-2 rounded-lg bg-white/5 border border-white/10">
                 <span className="font-semibold text-white block">Rent Control & Tenancy Acts</span>
-                <span>Deposit recovery, statutory eviction protections</span>
+                <span>Deposit recovery & eviction protection</span>
               </li>
               <li className="p-2 rounded-lg bg-white/5 border border-white/10">
-                <span className="font-semibold text-white block">Municipal Grievance Redressal</span>
-                <span>Water, sanitation, roads & civil utilities</span>
+                <span className="font-semibold text-white block">Municipal & Disability Acts</span>
+                <span>Civil utilities & RPwD Act 2016</span>
               </li>
             </ul>
           </div>
