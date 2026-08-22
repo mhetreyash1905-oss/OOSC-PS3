@@ -28,12 +28,11 @@ app.include_router(platform_router)
 @app.on_event("startup")
 async def startup_event():
     logger.info("Verifying MongoDB connection...")
-    try:
-        await verify_connection()
+    connected = await verify_connection()
+    if connected:
         logger.info("Successfully connected to MongoDB.")
-    except Exception as e:
-        logger.error(f"Failed to connect to MongoDB on startup: {e}")
-        raise e
+    else:
+        logger.warning("MongoDB is currently not reachable. Note: Configure MONGODB_URI in backend/.env with your Atlas cluster string.")
 
 @app.get("/")
 async def health_check():

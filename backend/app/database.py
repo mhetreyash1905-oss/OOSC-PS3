@@ -4,7 +4,7 @@ from app.config import MONGODB_URI, DATABASE_NAME
 
 logger = logging.getLogger(__name__)
 
-client = AsyncIOMotorClient(MONGODB_URI)
+client = AsyncIOMotorClient(MONGODB_URI, serverSelectionTimeoutMS=3000)
 db = client[DATABASE_NAME]
 
 users_collection = db["users"]
@@ -16,5 +16,5 @@ async def verify_connection():
         await client.admin.command('ping')
         return True
     except Exception as e:
-        logger.error(f"Failed to connect to MongoDB: {e}")
-        raise e
+        logger.warning(f"MongoDB connection check failed: {e}")
+        return False

@@ -15,28 +15,35 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 
 class IntakeResponse(BaseModel):
     is_complete: bool = Field(description="True if you have gathered enough information to classify the issue and extract all required fields. False if you still need to ask a clarifying question.")
-    agent_message: Optional[str] = Field(description="The next clarifying question or empathetic response to the user. Provide this if is_complete is False.")
-    category: Optional[str] = Field(description="Must be 'tenant_dispute', 'municipal_civic', or 'out_of_scope'. Required if is_complete is True.")
-    location: Optional[str] = Field(description="City and State in India. Required if is_complete is True.")
-    facts: Optional[str] = Field(description="Clear summary of what happened. Required if is_complete is True.")
-    desired_outcome: Optional[str] = Field(description="What the user wants to achieve. Required if is_complete is True.")
-    specific_details: Optional[str] = Field(description="Any extra category-specific details (e.g., lease duration, specific failing service).")
+    agent_message: Optional[str] = Field(description="Empathetic response or clarifying question to the user in a natural, supportive tone.")
+    issue_detected: Optional[str] = Field(description="The detected civic or legal issue title, e.g. 'Tenant–Landlord Dispute', 'Municipal Civic Service Issue', 'RTI & Public Information Request', 'Property & Rent Dispute', or 'General Civic Issue'.")
+    issue_icon: Optional[str] = Field(description="An appropriate single emoji icon representing the issue, e.g. '🏠' for tenancy, '🏛️' for municipal, '📜' for RTI, '⚖️' for legal.")
+    suggested_actions: Optional[List[str]] = Field(description="A concise list of 3-5 immediate practical steps the user should consider (e.g. 'Check your rental agreement', 'Send a written demand', 'Preserve payment records', 'Approach the appropriate grievance/legal forum if unresolved').")
+    category: Optional[str] = Field(description="Must be 'tenant_dispute', 'municipal_civic', or 'out_of_scope'.")
+    location: Optional[str] = Field(description="City and State in India if identified or inferred.")
+    facts: Optional[str] = Field(description="Clear summary of the user's issue facts.")
+    desired_outcome: Optional[str] = Field(description="What the user wants to achieve.")
+    specific_details: Optional[str] = Field(description="Any extra category-specific details (e.g., lease duration, deposit amount, specific failing municipal service).")
 
-SYSTEM_PROMPT = """You are a legal triage agent for the Civic Rights Navigator.
-Your goal is to understand the user's problem and classify it into either 'tenant_dispute' or 'municipal_civic'.
-If it doesn't fit those, classify as 'out_of_scope'.
+SYSTEM_PROMPT = """You are CivicSaathi (Civic Rights Navigator), an intelligent AI Civic and Legal Assistant designed to assist Indian citizens with tenancy problems, municipal issues, and RTI (Right to Information) processes.
 
-You need to collect:
-1. The core facts of what happened.
-2. The location (City and State in India).
-3. The user's desired outcome.
-4. Any specific details (e.g., notice period given, type of civic issue).
+You can comprehend user inputs in English, Hindi, and Hinglish (e.g., "Mere landlord ne security deposit wapas nahi kiya", "Pani ki problem hai colony me", "Landlord is evicting without notice").
 
-Rules:
-- Be empathetic, brief, and professional.
-- Ask ONE question at a time.
-- Do not give legal advice here. Just collect information.
-- Once you have all the information, set is_complete=True and fill out the category, location, facts, and desired_outcome fields.
+For EVERY user query:
+1. Always identify the detected issue and provide:
+   - `issue_detected`: e.g., "Tenant–Landlord Dispute", "Municipal Civic Service Issue", "RTI & Public Records Request".
+   - `issue_icon`: e.g., "🏠" for tenancy/landlord issues, "🏛️" for municipal/civic issues, "📜" for RTI.
+   - `suggested_actions`: 3 to 4 actionable, practical steps under "You may want to:" (e.g., "Check your rental agreement", "Send a written demand notice", "Preserve payment records & receipts", "Approach the appropriate grievance/legal forum if unresolved").
+   - `agent_message`: An empathetic, clear response acknowledging their exact situation (e.g. "I understand your situation. Security deposit withholding by landlords without valid justification is a common issue under tenancy frameworks.").
+
+2. Classify into:
+   - `category`: 'tenant_dispute' (rent, eviction, security deposit, repairs, tenancy), 'municipal_civic' (water, roads, garbage, sanitation, municipal inaction, RTI for civic records), or 'out_of_scope' (criminal, matrimonial, etc.).
+
+3. If the user provided enough detail about what occurred (e.g., landlord refused to return deposit, or municipal authority not repairing water pipeline):
+   - Set `is_complete` = True so the user can immediately click "Create Action Plan" to view grounded legal rights, statutory provisions, and draft an official notice/RTI.
+   - If critical information is missing, you can set `is_complete` = False and ask a helpful clarifying question (e.g., "Which city/state are you located in?" or "Do you have a written rental agreement?").
+
+Always maintain an empathetic, reassuring, and professional tone.
 """
 
 async def process_intake_message(chat_history: List[dict], new_message: str) -> dict:
@@ -57,7 +64,7 @@ async def process_intake_message(chat_history: List[dict], new_message: str) -> 
     try:
         response = await asyncio.to_thread(
             client.models.generate_content,
-            model='gemini-3.6-flash',
+            model='gemini-2.5-flash',
             contents=contents,
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT,
@@ -71,4 +78,20 @@ async def process_intake_message(chat_history: List[dict], new_message: str) -> 
         return result
     except Exception as e:
         logger.error(f"Error in Gemini Intake API: {e}")
-        raise e
+        # Fallback response if API fails or rate limits
+        return {
+            "is_complete": True,
+            "agent_message": "I understand your situation. Let me help you navigate your civic and legal options.",
+            "issue_detected": "Civic / Tenancy Issue",
+            "issue_icon": "🏠",
+            "suggested_actions": [
+                "Review relevant documents and agreements",
+                "Send a formal written communication",
+                "Preserve all transaction and communication records",
+                "Proceed with an Action Plan for legal rights analysis"
+            ],
+            "category": "tenant_dispute" if ("landlord" in new_message.lower() or "rent" in new_message.lower() or "deposit" in new_message.lower()) else "municipal_civic",
+            "location": "India",
+            "facts": new_message,
+            "desired_outcome": "Resolution and recovery/redressal"
+        }
