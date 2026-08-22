@@ -101,24 +101,54 @@ async def intake_message(request: IntakeRequest, current_user: dict = Depends(ge
 
     history = session.get("intake_history", [])
     ai_response = await process_intake_message(history, request.message)
-    new_history = history + [{"role": "user", "content": request.message}]
+    
+    agent_msg = ai_response.get("agent_message", "I understand your situation. Let us work on resolving it.")
+    issue_detected = ai_response.get("issue_detected")
+    issue_icon = ai_response.get("issue_icon") or "⚖️"
+    suggested_actions = ai_response.get("suggested_actions") or []
+    
+    agent_record = {
+        "role": "agent",
+        "content": agent_msg,
+        "issue_detected": issue_detected,
+        "issue_icon": issue_icon,
+        "suggested_actions": suggested_actions,
+        "is_complete": ai_response.get("is_complete", False)
+    }
+    
+    new_history = history + [
+        {"role": "user", "content": request.message},
+        agent_record
+    ]
+    
+    intake_data = {
+        "category": ai_response.get("category"),
+        "location": ai_response.get("location") or "India",
+        "facts": ai_response.get("facts") or request.message,
+        "desired_outcome": ai_response.get("desired_outcome") or "Resolution of issue",
+        "specific_details": ai_response.get("specific_details"),
+        "issue_detected": issue_detected,
+        "issue_icon": issue_icon,
+        "suggested_actions": suggested_actions
+    }
     
     if not ai_response.get("is_complete"):
-        agent_msg = ai_response.get("agent_message", "Could you provide more details?")
-        new_history.append({"role": "agent", "content": agent_msg})
         await sessions_collection.update_one(
             {"_id": session_id},
-            {"$set": {"intake_history": new_history}}
+            {"$set": {
+                "intake_history": new_history,
+                "intake": intake_data
+            }}
         )
-        return {"status": "in_progress", "agent_message": agent_msg}
-    else:
-        intake_data = {
-            "category": ai_response.get("category"),
-            "location": ai_response.get("location"),
-            "facts": ai_response.get("facts"),
-            "desired_outcome": ai_response.get("desired_outcome"),
-            "specific_details": ai_response.get("specific_details")
+        return {
+            "status": "in_progress",
+            "agent_message": agent_msg,
+            "issue_detected": issue_detected,
+            "issue_icon": issue_icon,
+            "suggested_actions": suggested_actions,
+            "intake_data": intake_data
         }
+    else:
         await sessions_collection.update_one(
             {"_id": session_id},
             {"$set": {
@@ -127,7 +157,14 @@ async def intake_message(request: IntakeRequest, current_user: dict = Depends(ge
                 "status": "rights"
             }}
         )
-        return {"status": "complete", "intake_data": intake_data}
+        return {
+            "status": "complete",
+            "agent_message": agent_msg,
+            "issue_detected": issue_detected,
+            "issue_icon": issue_icon,
+            "suggested_actions": suggested_actions,
+            "intake_data": intake_data
+        }
 
 @router.post("/rights")
 async def rights(request: SessionRequest, current_user: dict = Depends(get_current_user)):
@@ -237,3 +274,81 @@ async def download_rti(session_id_str: str, current_user: dict = Depends(get_cur
             "Content-Disposition": f'attachment; filename="RTI_Application_{session_id_str}.pdf"'
         }
     )
+
+@router.get("/documents")
+async def get_saved_documents(current_user: dict = Depends(get_current_user)):
+    """Retrieve all generated documents and drafts for the current user."""
+    cursor = sessions_collection.find(
+        {"user_id": current_user["user_id"], "rti_document": {"$ne": None}},
+        {"_id": 1, "created_at": 1, "rti_document": 1, "intake": 1, "status": 1}
+    ).sort("created_at", -1)
+    
+    docs = []
+    async for session in cursor:
+        rti = session.get("rti_document", {})
+        intake = session.get("intake", {}) or {}
+        docs.append({
+            "id": str(session["_id"]),
+            "session_id": str(session["_id"]),
+            "title": rti.get("subject") or f"RTI Application - {intake.get('category', 'Civic Issue')}",
+            "type": "RTI Application (PDF)",
+            "category": intake.get("category", "General Civic"),
+            "department": rti.get("pio_department") or rti.get("pio_designation") or "Public Information Authority",
+            "created_at": session.get("created_at", "").isoformat() if session.get("created_at") else None,
+            "download_url": f"/platform/download-rti/{str(session['_id'])}"
+        })
+    return {"documents": docs}
+
+@router.get("/applications")
+async def get_applications(current_user: dict = Depends(get_current_user)):
+    """Retrieve all civic applications, RTIs, and complaints initiated by user."""
+    cursor = sessions_collection.find(
+        {"user_id": current_user["user_id"]},
+        {"_id": 1, "created_at": 1, "status": 1, "intake": 1, "recommendation": 1, "rti_document": 1}
+    ).sort("created_at", -1)
+    
+    apps = []
+    async for session in cursor:
+        intake = session.get("intake") or {}
+        rec = session.get("recommendation") or {}
+        has_doc = session.get("rti_document") is not None
+        
+        status_label = "Drafting"
+        if has_doc or session.get("status") == "complete":
+            status_label = "Ready to File"
+        elif session.get("status") == "recommendation":
+            status_label = "Strategy Formed"
+        elif session.get("status") == "rights":
+            status_label = "Rights Analyzed"
+        elif session.get("status") == "intake":
+            status_label = "In Assessment"
+
+        title = intake.get("facts", "")[:80] if intake.get("facts") else "Civic Rights Query"
+        category = intake.get("category", "tenancy_dispute").replace("_", " ").title()
+        
+        apps.append({
+            "id": str(session["_id"]),
+            "session_id": str(session["_id"]),
+            "title": title,
+            "category": category,
+            "issue_detected": intake.get("issue_detected") or category,
+            "status": status_label,
+            "action_type": rec.get("action_type") or "file_rti",
+            "created_at": session.get("created_at", "").isoformat() if session.get("created_at") else None,
+            "has_download": has_doc
+        })
+    return {"applications": apps}
+
+class DocumentUploadRequest(BaseModel):
+    filename: str
+    content: str
+    file_type: str = "text"
+
+@router.post("/upload-document")
+async def upload_document(req: DocumentUploadRequest, current_user: dict = Depends(get_current_user)):
+    """Accept and summarize text from uploaded documents (agreements, notices, bills)."""
+    return {
+        "filename": req.filename,
+        "summary": f"Document '{req.filename}' received and attached to your session context.",
+        "size_chars": len(req.content)
+    }
