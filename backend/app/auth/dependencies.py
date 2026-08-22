@@ -1,17 +1,35 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from app.auth.utils import decode_access_token
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from app.firebase_admin_config import verify_firebase_token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+bearer_scheme = HTTPBearer()
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
-    payload = decode_access_token(token)
-    user_id = payload.get("sub")
-    email = payload.get("email")
-    if user_id is None or email is None:
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+) -> dict:
+    """
+    Dependency that extracts and verifies the Firebase ID token from the
+    Authorization: Bearer <token> header.
+    Returns {"user_id": firebase_uid, "email": user_email}.
+    """
+    token = credentials.credentials
+    try:
+        decoded = verify_firebase_token(token)
+    except ValueError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    user_id = decoded.get("uid")
+    email = decoded.get("email")
+
+    if not user_id or not email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     return {"user_id": user_id, "email": email}

@@ -7,9 +7,10 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
 from app.knowledge_base.retriever import KnowledgeBaseRetriever
+from app.config import GEMINI_API_KEY
 
 logger = logging.getLogger(__name__)
-client = genai.Client()
+client = genai.Client(api_key=GEMINI_API_KEY)
 retriever = KnowledgeBaseRetriever()
 
 class Citation(BaseModel):
@@ -68,7 +69,7 @@ async def generate_rights_explanation(intake_data: Dict[str, Any]) -> dict:
                 system_instruction=prompt,
                 response_mime_type="application/json",
                 response_schema=RightsResponse,
-                temperature=0.1,  # Low temperature for factual grounding
+                temperature=0.1,
             )
         )
         

@@ -1,36 +1,24 @@
-from pydantic import BaseModel, EmailStr, model_validator
+from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
-class UserRegister(BaseModel):
-    email: EmailStr
-    password: str
-    confirm_password: str
-    first_name: str
-    last_name: str
-    gender: str
 
-    @model_validator(mode='after')
-    def check_passwords_match(self):
-        if self.password != self.confirm_password:
-            raise ValueError('Passwords do not match')
-        if len(self.password) < 6:
-            raise ValueError('Password must be at least 6 characters long')
-        return self
+class UserProfileCreate(BaseModel):
+    """
+    Sent by the frontend after Firebase creates the account (email/password or Google).
+    The Firebase ID token is verified separately via the Authorization header.
+    All fields are optional so Google sign-in can omit them and get sensible defaults.
+    """
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    gender: Optional[str] = "prefer-not-to-say"
 
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str = 'bearer'
-    email: str
 
 class UserInDB(BaseModel):
     id: str
     email: str
     created_at: datetime
+
 
 class UserUpdate(BaseModel):
     first_name: Optional[str] = None

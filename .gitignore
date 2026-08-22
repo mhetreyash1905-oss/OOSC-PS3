@@ -26,6 +26,10 @@ build/
 backend/chroma_db/
 *.sqlite3
 
+# Firebase credentials (never commit these)
+firebase-service-account.json
+backend/firebase-service-account.json
+
 # OS generated files
 .DS_Store
 Thumbs.db

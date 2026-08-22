@@ -1,6 +1,6 @@
 'use client';
 
-import { getToken, removeToken } from './auth';
+import { getIdToken } from './auth';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -11,7 +11,9 @@ interface ApiOptions {
 }
 
 export async function apiFetch<T = unknown>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-  const token = getToken();
+  // Get a fresh Firebase ID token (auto-refreshed if expired)
+  const token = await getIdToken();
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options.headers,
@@ -28,7 +30,6 @@ export async function apiFetch<T = unknown>(endpoint: string, options: ApiOption
   });
 
   if (response.status === 401) {
-    removeToken();
     if (typeof window !== 'undefined') {
       window.location.href = '/login';
     }

@@ -6,8 +6,10 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
 
+from app.config import GEMINI_API_KEY
+
 logger = logging.getLogger(__name__)
-client = genai.Client()
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 class ActionRecommendation(BaseModel):
     action_type: str = Field(description="Must be 'file_rti' or 'other'. Always prefer 'file_rti' if the user needs information from a government/public authority.")
@@ -25,7 +27,7 @@ async def generate_recommendation(intake_data: dict, rights_data: dict) -> dict:
     try:
         response = await asyncio.to_thread(
             client.models.generate_content,
-            model='gemini-2.5-flash-lite',
+            model='gemini-3.6-flash',
             contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_msg)])],
             config=types.GenerateContentConfig(
                 system_instruction=prompt,

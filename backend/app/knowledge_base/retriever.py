@@ -1,7 +1,7 @@
 import os
 import asyncio
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer
 import chromadb
 
@@ -12,6 +12,7 @@ class RetrievedChunk:
     section_title: str
     relevance_score: float
     chunk_index: int
+    metadata: Dict[str, Any] = field(default_factory=dict)  # full metadata dict for agents
 
 class KnowledgeBaseRetriever:
     _instance = None
@@ -49,7 +50,8 @@ class KnowledgeBaseRetriever:
                     source_document=metadata.get('source_document', ''),
                     section_title=metadata.get('section_title', ''),
                     relevance_score=distance,
-                    chunk_index=metadata.get('chunk_index', 0)
+                    chunk_index=metadata.get('chunk_index', 0),
+                    metadata=metadata,  # store full metadata so agents can access source_type, state, etc.
                 )
                 retrieved_chunks.append(chunk)
                 

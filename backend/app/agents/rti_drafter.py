@@ -7,8 +7,10 @@ from google.genai import types
 from pydantic import BaseModel, Field
 from app.pio_directory import get_pio_details
 
+from app.config import GEMINI_API_KEY
+
 logger = logging.getLogger(__name__)
-client = genai.Client()
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 class RTIDraft(BaseModel):
     subject: str = Field(description="A formal subject line for the RTI application (e.g., Seeking Information regarding...)")
@@ -27,7 +29,7 @@ async def draft_rti_application(intake_data: dict, recommendation: dict, user_em
     try:
         response = await asyncio.to_thread(
             client.models.generate_content,
-            model='gemini-2.5-flash',
+            model='gemini-3.6-flash',
             contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_msg)])],
             config=types.GenerateContentConfig(
                 system_instruction=prompt,

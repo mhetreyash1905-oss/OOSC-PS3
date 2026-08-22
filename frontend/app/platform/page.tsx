@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { isAuthenticated, getToken } from '@/lib/auth';
+import { getIdToken } from '@/lib/auth';
+import { useAuth } from '@/components/AuthProvider';
 import { apiFetch } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import RightsExplanation from '@/components/RightsExplanation';
@@ -47,15 +48,18 @@ export default function PlatformPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const { user, loading: authLoading } = useAuth();
+
   useEffect(() => {
-    if (!isAuthenticated()) {
+    if (authLoading) return; // Wait for Firebase to resolve persisted session
+    if (!user) {
       router.push('/login');
-    } else {
-      setLoadingAuth(false);
-      loadHistory();
-      startSession();
+      return;
     }
-  }, [router]);
+    setLoadingAuth(false);
+    loadHistory();
+    startSession();
+  }, [authLoading, user, router]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -171,7 +175,7 @@ export default function PlatformPage() {
     setIsDownloading(true);
     setErrorMsg(null);
     try {
-      const token = getToken();
+      const token = await getIdToken();
       const response = await fetch(`http://localhost:8000/platform/download-rti/${sessionId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
