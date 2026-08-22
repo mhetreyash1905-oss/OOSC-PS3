@@ -26,6 +26,32 @@ class RightsResponse(BaseModel):
     confidence: str = Field(description="Confidence level: 'high', 'medium', or 'low' based on how well the chunks cover the user's situation.")
     contradiction_warning: str | None = Field(description="If the retrieved chunks contain contradictory or conflicting laws (e.g., state law vs federal law, or older amendment vs newer rule), explicitly flag the conflict here. Otherwise, leave null.")
 
+
+def _knowledge_base_fallback(chunks: list[Any]) -> dict:
+    citations = [
+        {
+            "id": index,
+            "document": chunk.source_document,
+            "section": chunk.section_title,
+            "text": chunk.text[:500],
+            "full_chunk_text": chunk.text,
+        }
+        for index, chunk in enumerate(chunks[:5], 1)
+    ]
+    if chunks:
+        message = (
+            "The AI analysis service is temporarily unavailable. The following local legal "
+            "passages are relevant, but I cannot provide a complete case-specific explanation "
+            "right now."
+        )
+    else:
+        message = "I don't have sufficient legal text in my knowledge base to address this specific point."
+    return {
+        "explanation": f"{message}\n\nThis explains general rights under relevant laws. It is not a substitute for a lawyer.",
+        "citations": citations,
+        "confidence": "low",
+    }
+
 SYSTEM_PROMPT = """You are a legal rights explainer for the Civic Rights Navigator.
 You MUST ONLY use the legal text chunks provided below to explain the user's rights.
 
@@ -88,4 +114,4 @@ async def generate_rights_explanation(intake_data: Dict[str, Any]) -> dict:
         return result
     except Exception as e:
         logger.error(f"Error in Rights Navigator API: {e}")
-        raise e
+        return _knowledge_base_fallback(chunks)
