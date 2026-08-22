@@ -1,3 +1,4 @@
+from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime
 from app.auth.models import UserProfileCreate, UserUpdate
