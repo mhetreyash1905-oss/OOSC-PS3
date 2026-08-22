@@ -48,6 +48,9 @@ def ingest_documents():
             meta["ambiguity"] = "1960 Act was repealed by TN Regulation of Rights and Responsibilities of Landlords and Tenants Act 2017, but old act governs legacy disputes."
         elif "maharashtra" in fname_lower:
             meta["state"] = "Maharashtra"
+        elif any(keyword in fname_lower for keyword in ["consumer", "labour", "motor", "rpwd", "nfsa"]):
+            meta["state"] = "Federal/General"
+            meta["source_type"] = "verbatim_statute" if ext == '.md' else meta["source_type"] # These MD files contain exact legal text
             
         return meta
         
