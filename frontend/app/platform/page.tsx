@@ -44,7 +44,9 @@ export default function PlatformPage() {
 
   // Voice Input State
   const [isListening, setIsListening] = useState(false);
+  const [voiceLang, setVoiceLang] = useState<'en-IN' | 'hi-IN'>('en-IN');
   const recognitionRef = useRef<any>(null);
+  const baseTextRef = useRef<string>('');
 
   // Document Upload State
   const [attachedFile, setAttachedFile] = useState<{ name: string; content?: string } | null>(null);
@@ -95,15 +97,25 @@ export default function PlatformPage() {
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = true;
-        recognition.lang = 'hi-IN';
+        recognition.lang = voiceLang;
 
         recognition.onresult = (event: any) => {
-          let transcript = '';
+          let finalTranscript = '';
+          let interimTranscript = '';
+
           for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
+            const transcriptChunk = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcriptChunk;
+            } else {
+              interimTranscript += transcriptChunk;
+            }
           }
-          if (transcript) {
-            setInputText(prev => (prev ? `${prev} ${transcript}` : transcript));
+
+          const currentSpeech = (finalTranscript || interimTranscript).trim();
+          if (currentSpeech) {
+            const base = baseTextRef.current.trim();
+            setInputText(base ? `${base} ${currentSpeech}` : currentSpeech);
           }
         };
 
@@ -119,7 +131,7 @@ export default function PlatformPage() {
         recognitionRef.current = recognition;
       }
     }
-  }, []);
+  }, [voiceLang]);
 
   const toggleVoiceInput = () => {
     if (!recognitionRef.current) {
@@ -132,6 +144,8 @@ export default function PlatformPage() {
       setIsListening(false);
     } else {
       try {
+        baseTextRef.current = inputText;
+        recognitionRef.current.lang = voiceLang;
         recognitionRef.current.start();
         setIsListening(true);
       } catch (e) {
@@ -577,6 +591,17 @@ export default function PlatformPage() {
                     >
                       <span>🎤</span>
                       <span>{isListening ? 'Listening...' : 'Voice input'}</span>
+                    </button>
+
+                    {/* Voice Language Switcher */}
+                    <button
+                      type="button"
+                      onClick={() => setVoiceLang(prev => prev === 'en-IN' ? 'hi-IN' : 'en-IN')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-[#2f2d2d] hover:bg-gray-200 dark:hover:bg-[#3d3a3a] text-gray-700 dark:text-gray-300 transition-colors"
+                      title="Switch voice recognition language (English / Hindi)"
+                    >
+                      <span>🌐</span>
+                      <span>{voiceLang === 'en-IN' ? 'EN' : 'HI'}</span>
                     </button>
 
                     {/* Upload Document Button */}
