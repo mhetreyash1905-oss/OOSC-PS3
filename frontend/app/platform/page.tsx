@@ -204,6 +204,10 @@ export default function PlatformPage() {
 
   const handleSendMessage = async (e?: React.FormEvent, presetMessage?: string) => {
     if (e) e.preventDefault();
+    if (step !== 1) {
+      setErrorMsg('This conversation has moved to the action plan. Start a new chat to ask about another issue.');
+      return;
+    }
     let userMsg = presetMessage || inputText.trim();
     if (!userMsg || !sessionId || isTyping) return;
 
@@ -1167,14 +1171,14 @@ export default function PlatformPage() {
                     type="text"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    disabled={isTyping}
-                    placeholder="Ask follow-up or describe details in English / Hindi / Hinglish..."
+                    disabled={isTyping || step !== 1}
+                    placeholder={step === 1 ? 'Describe your issue in English / Hindi / Hinglish...' : 'Start a new chat to discuss another issue'}
                     className="flex-1 bg-transparent text-gray-900 dark:text-[#f0f0f0] placeholder-gray-400 dark:placeholder-gray-500 outline-none px-3 py-2 text-sm"
                   />
 
                   <button
                     type="submit"
-                    disabled={isTyping || !inputText.trim()}
+                    disabled={isTyping || step !== 1 || !inputText.trim()}
                     className="bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 disabled:opacity-40 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
                   >
                     <span>Ask CivicSaathi</span>
