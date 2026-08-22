@@ -28,9 +28,12 @@ You MUST ONLY use the legal text chunks provided below to explain the user's rig
 RULES FOR GROUNDING:
 1. For EVERY factual claim or right you explain, you MUST cite the source using the format [Source: X], where X is the ID of the provided chunk.
 2. DO NOT use general legal knowledge outside of the provided chunks.
-3. If the provided chunks do not cover the user's specific situation, clearly state: "I don't have sufficient legal text in my knowledge base to address this specific point." and flag confidence as 'low'.
-4. YOU ARE STRICTLY PROHIBITED FROM PREDICTING LEGAL OUTCOMES. If the user asks if they will win, you MUST explicitly state: "I cannot predict the outcome of any legal case or tell you if you will win. I can only explain your rights."
-5. You MUST end your explanation with this exact disclaimer: "This explains general rights under relevant laws. It is not a substitute for a lawyer."
+3. Pay attention to the metadata of the provided chunks:
+   - If a chunk's `source_type` is `"verbatim_statute"`, it contains the exact text of the law. You should quote from it or treat it as legally binding statute.
+   - If a chunk's `source_type` is `"general_explainer"`, it is a helpful summary or guide, but it is NOT the official law. Do not treat it as a verbatim statute.
+4. If the provided chunks do not cover the user's specific situation, clearly state: "I don't have sufficient legal text in my knowledge base to address this specific point." and flag confidence as 'low'.
+5. YOU ARE STRICTLY PROHIBITED FROM PREDICTING LEGAL OUTCOMES. If the user asks if they will win, you MUST explicitly state: "I cannot predict the outcome of any legal case or tell you if you will win. I can only explain your rights."
+6. You MUST end your explanation with this exact disclaimer: "This explains general rights under relevant laws. It is not a substitute for a lawyer."
 
 Provided Legal Chunks:
 {chunks_text}
@@ -45,7 +48,12 @@ async def generate_rights_explanation(intake_data: Dict[str, Any]) -> dict:
     # Format chunks for prompt
     chunks_text = ""
     for i, chunk in enumerate(chunks, 1):
-        chunks_text += f"\n--- Chunk ID: {i} ---\nDocument: {chunk.source_document}\nSection: {chunk.section_title}\nText: {chunk.text}\n"
+        source_type = chunk.metadata.get("source_type", "unknown")
+        state = chunk.metadata.get("state", "Federal/General")
+        ambiguity = chunk.metadata.get("ambiguity", "")
+        ambiguity_str = f"\nAmbiguity Note: {ambiguity}" if ambiguity else ""
+        
+        chunks_text += f"\n--- Chunk ID: {i} ---\nDocument: {chunk.source_document}\nState: {state}\nSource Type: {source_type}{ambiguity_str}\nSection: {chunk.section_title}\nText: {chunk.text}\n"
     
     prompt = SYSTEM_PROMPT.format(chunks_text=chunks_text)
     user_message = f"Please explain my rights based on these facts:\nLocation: {intake_data.get('location')}\nFacts: {intake_data.get('facts')}\nGoal: {intake_data.get('desired_outcome')}"
