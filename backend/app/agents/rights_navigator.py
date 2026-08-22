@@ -63,7 +63,7 @@ async def generate_rights_explanation(intake_data: Dict[str, Any]) -> dict:
     try:
         response = await asyncio.to_thread(
             client.models.generate_content,
-            model='gemini-2.5-flash',
+            model='gemini-3.6-flash',
             contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_message)])],
             config=types.GenerateContentConfig(
                 system_instruction=prompt,
