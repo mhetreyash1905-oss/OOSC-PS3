@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 _firebase_initialized = False
+_allow_unverified_dev_tokens = os.getenv("ALLOW_UNVERIFIED_DEV_TOKENS", "false").lower() == "true"
 
 def _initialize_firebase():
     global _firebase_initialized
@@ -42,16 +43,17 @@ def verify_firebase_token(id_token: str) -> dict:
         return decoded
     except Exception as e:
         logger.warning(f"Firebase token verification failed: {e}")
-        # If running in local dev mode without service account, fallback to decoding payload
-        try:
-            import jwt
-            decoded = jwt.decode(id_token, options={"verify_signature": False})
-            if "user_id" in decoded or "sub" in decoded:
-                return {
-                    "uid": decoded.get("user_id") or decoded.get("sub"),
-                    "email": decoded.get("email", "citizen@civicsaathi.in"),
-                    **decoded
-                }
-        except Exception:
-            pass
+        if _allow_unverified_dev_tokens:
+            try:
+                import jwt
+                decoded = jwt.decode(id_token, options={"verify_signature": False})
+                if "user_id" in decoded or "sub" in decoded:
+                    logger.warning("Accepted an unverified Firebase token because ALLOW_UNVERIFIED_DEV_TOKENS is enabled.")
+                    return {
+                        "uid": decoded.get("user_id") or decoded.get("sub"),
+                        "email": decoded.get("email", "citizen@civicsaathi.in"),
+                        **decoded
+                    }
+            except Exception:
+                pass
         raise ValueError(f"Invalid Firebase token: {e}")

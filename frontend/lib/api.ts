@@ -23,11 +23,25 @@ export async function apiFetch<T = unknown>(endpoint: string, options: ApiOption
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    method: options.method || 'GET',
-    headers,
-    body: options.body ? JSON.stringify(options.body) : undefined,
-  });
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 30000);
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      method: options.method || 'GET',
+      headers,
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error('The request took too long. Please try again.');
+    }
+    throw new Error('Unable to reach CivicSaathi. Check your connection and try again.');
+  } finally {
+    window.clearTimeout(timeout);
+  }
 
   if (response.status === 401) {
     if (typeof window !== 'undefined') {
