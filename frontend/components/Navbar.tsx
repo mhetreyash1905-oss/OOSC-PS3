@@ -9,7 +9,7 @@ import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { user } = useAuth();  // Reactive — updates instantly on sign-in/out
+  const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
@@ -18,26 +18,59 @@ export default function Navbar() {
 
   const handleLogout = () => { logout(); };
 
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/about', label: 'About' },
+    { href: '/rti-guide', label: 'RTI Guide' },
+    { href: '/resources', label: 'Resources' },
+    { href: '/faq', label: 'FAQ' },
+    { href: '/contact', label: 'Contact' },
+  ];
+
   return (
     <nav className="sticky top-0 z-50 bg-[#fbfcf9]/95 dark:bg-[#1a1919]/95 backdrop-blur border-b border-[#dce3df] dark:border-[#333] shadow-[0_4px_20px_rgba(24,37,43,0.05)] transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <svg className="w-8 h-8 text-[#0e6670] dark:text-[#78c4c2] transition-transform group-hover:-rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11V7a4 4 0 018 0v4m0 4.5c.01.2.02.4.02.61m-6.6-4.5c-.244.2-.472.417-.687.649m4.936-2.27c.45-.632.78-1.353 1.05-2.126m0 0C15.82 8.784 16 7.915 16 7m0 0c0-1.871-.655-3.59-1.75-4.94M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"></path>
-              </svg>
-              <span className="font-bold text-lg sm:text-xl tracking-tight text-[#0e6670] dark:text-[#78c4c2]">Civic Rights Navigator</span>
+              <div className="w-9 h-9 rounded-xl bg-[#0e6670] dark:bg-[#78c4c2] text-white dark:text-[#102a2e] flex items-center justify-center font-bold text-base shadow-sm transition-transform group-hover:scale-105">
+                ⚖️
+              </div>
+              <span className="font-bold text-lg sm:text-xl tracking-tight text-[#0e6670] dark:text-[#78c4c2]">CivicSaathi</span>
             </Link>
-            <div className="hidden md:ml-10 md:flex md:items-center md:gap-2">
-              <Link href="/" className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${pathname === '/' ? 'text-[#0e6670] bg-[#dcefeb]' : 'text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1]'}`}>Home</Link>
-              <Link href="/about" className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${pathname === '/about' ? 'text-[#0e6670] bg-[#dcefeb]' : 'text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1]'}`}>About</Link>
+            <div className="hidden lg:ml-8 lg:flex lg:items-center lg:gap-1">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      isActive
+                        ? 'text-[#0e6670] bg-[#dcefeb] dark:text-[#78c4c2] dark:bg-[#2c3d3e]'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1] dark:hover:bg-[#2d2a2a]'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
               {isAuth && (
-                <Link href="/platform" className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${pathname === '/platform' ? 'text-[#0e6670] bg-[#dcefeb]' : 'text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1]'}`}>Platform</Link>
+                <Link
+                  href="/platform"
+                  className={`px-3.5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-1.5 ${
+                    pathname === '/platform'
+                      ? 'text-white bg-[#0e6670] shadow-sm'
+                      : 'text-[#0e6670] dark:text-[#e7b85b] bg-[#e7f4f1] dark:bg-[#2d2a2a] hover:bg-[#0e6670] hover:text-white'
+                  }`}
+                >
+                  <span>🤖</span>
+                  <span>AI Assistant</span>
+                </Link>
               )}
             </div>
           </div>
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden lg:flex items-center space-x-3">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -56,26 +89,30 @@ export default function Navbar() {
                 <button className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                   {email ? email.charAt(0).toUpperCase() : 'U'}
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#2d2a2a] rounded-md shadow-lg border border-gray-100 dark:border-[#444] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-[#2d2a2a] rounded-xl shadow-lg border border-gray-100 dark:border-[#444] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="px-4 py-3 border-b border-gray-100 dark:border-[#444]">
+                    <p className="text-xs text-gray-400 uppercase font-semibold">Signed In</p>
                     <p className="text-sm leading-5 text-gray-900 dark:text-gray-200 font-medium truncate">{email}</p>
                   </div>
                   <div className="py-1">
+                    <Link href="/platform" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">AI Civic Assistant</Link>
+                    <Link href="/cases" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">My Cases</Link>
+                    <Link href="/saved-documents" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">Saved Documents</Link>
                     <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">Settings</Link>
                     <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-[#3d3a3a]">Logout</button>
                   </div>
                 </div>
               </div>
             ) : (
-              <>
-                <Link href="/login" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 font-medium px-3 py-2">Login</Link>
-                <Link href="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Register</Link>
-              </>
+              <div className="flex items-center gap-2">
+                <Link href="/login" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 font-semibold px-3 py-2">Login</Link>
+                <Link href="/register" className="bg-[#0e6670] hover:bg-[#094d54] dark:bg-[#78c4c2] dark:hover:bg-[#68b3b1] dark:text-[#102a2e] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">Get Started</Link>
+              </div>
             )}
           </div>
 
           {/* Mobile header controls */}
-          <div className="flex items-center md:hidden gap-2">
+          <div className="flex items-center lg:hidden gap-2">
             <button
               onClick={toggleTheme}
               className="p-2 rounded-md text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2d2a2a]"
@@ -104,25 +141,38 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-[#1a1919]">
-          <div className="pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2d2a2a]">Home</Link>
-            <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2d2a2a]">About</Link>
-            {isAuth && (
-              <Link href="/platform" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2d2a2a]">Platform</Link>
-            )}
-          </div>
-          <div className="pt-4 pb-3 border-t border-gray-200 dark:border-[#333]">
+        <div className="lg:hidden bg-white dark:bg-[#1a1919] border-t border-gray-200 dark:border-[#333] px-4 pt-2 pb-4 space-y-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2d2a2a]"
+            >
+              {link.label}
+            </Link>
+          ))}
+          {isAuth && (
+            <Link
+              href="/platform"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-base font-bold text-[#0e6670] dark:text-[#e7b85b] bg-[#eef4f1] dark:bg-[#2d2a2a]"
+            >
+              🤖 AI Civic Assistant
+            </Link>
+          )}
+          <div className="pt-4 border-t border-gray-200 dark:border-[#333]">
             {isAuth ? (
-              <div className="px-5 space-y-3">
-                <div className="text-base font-medium text-gray-800 dark:text-gray-200">{email}</div>
-                <Link href="/settings" className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2d2a2a]">Settings</Link>
-                <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#2d2a2a]">Logout</button>
+              <div className="space-y-2">
+                <div className="text-xs text-gray-500 dark:text-gray-400 px-3">{email}</div>
+                <Link href="/cases" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300">My Cases</Link>
+                <Link href="/saved-documents" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300">Saved Documents</Link>
+                <button onClick={handleLogout} className="block w-full text-left px-3 py-1.5 text-sm text-red-600 dark:text-red-400">Logout</button>
               </div>
             ) : (
-              <div className="px-5 space-y-3">
-                <Link href="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 hover:bg-gray-50 dark:hover:bg-[#2d2a2a]">Login</Link>
-                <Link href="/register" className="block w-full text-center bg-blue-600 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700">Register</Link>
+              <div className="flex gap-2 pt-2">
+                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 text-center border border-gray-300 dark:border-[#444] text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm font-semibold">Login</Link>
+                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 text-center bg-[#0e6670] text-white py-2 rounded-lg text-sm font-semibold">Register</Link>
               </div>
             )}
           </div>
