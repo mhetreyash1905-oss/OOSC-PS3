@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+import asyncio
 from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
@@ -54,7 +55,8 @@ async def process_intake_message(chat_history: List[dict], new_message: str) -> 
     contents.append(types.Content(role="user", parts=[types.Part.from_text(text=new_message)]))
 
     try:
-        response = client.models.generate_content(
+        response = await asyncio.to_thread(
+            client.models.generate_content,
             model='gemini-3.6-flash',
             contents=contents,
             config=types.GenerateContentConfig(

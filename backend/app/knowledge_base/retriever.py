@@ -1,4 +1,5 @@
 import os
+import asyncio
 from dataclasses import dataclass
 from typing import List
 from sentence_transformers import SentenceTransformer
@@ -28,8 +29,8 @@ class KnowledgeBaseRetriever:
         self.client = chromadb.PersistentClient(path=chroma_db_dir)
         self.collection = self.client.get_collection(name='legal_knowledge_base')
 
-    def retrieve(self, query: str, n_results: int = 5) -> List[RetrievedChunk]:
-        query_embedding = self.model.encode(query).tolist()
+    async def retrieve(self, query: str, n_results: int = 5) -> List[RetrievedChunk]:
+        query_embedding = (await asyncio.to_thread(self.model.encode, query)).tolist()
         
         results = self.collection.query(
             query_embeddings=[query_embedding],

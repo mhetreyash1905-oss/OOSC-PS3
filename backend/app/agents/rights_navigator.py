@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+import asyncio
 from typing import Dict, Any
 from google import genai
 from google.genai import types
@@ -43,7 +44,7 @@ async def generate_rights_explanation(intake_data: Dict[str, Any]) -> dict:
     query = f"{intake_data.get('category', '')} {intake_data.get('facts', '')} {intake_data.get('desired_outcome', '')}"
     
     # Retrieve top 5 chunks
-    chunks = retriever.retrieve(query, n_results=5)
+    chunks = await retriever.retrieve(query, n_results=5)
     
     # Format chunks for prompt
     chunks_text = ""
@@ -59,7 +60,8 @@ async def generate_rights_explanation(intake_data: Dict[str, Any]) -> dict:
     user_message = f"Please explain my rights based on these facts:\nLocation: {intake_data.get('location')}\nFacts: {intake_data.get('facts')}\nGoal: {intake_data.get('desired_outcome')}"
     
     try:
-        response = client.models.generate_content(
+        response = await asyncio.to_thread(
+            client.models.generate_content,
             model='gemini-3.6-flash',
             contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_message)])],
             config=types.GenerateContentConfig(

@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import asyncio
 from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
@@ -24,7 +25,8 @@ async def draft_rti_application(intake_data: dict, recommendation: dict, user_em
     user_msg = f"Facts: {json.dumps(intake_data)}\nRecommended RTI Focus: {recommendation.get('rti_info_requested')}"
     
     try:
-        response = client.models.generate_content(
+        response = await asyncio.to_thread(
+            client.models.generate_content,
             model='gemini-2.5-flash',
             contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_msg)])],
             config=types.GenerateContentConfig(
