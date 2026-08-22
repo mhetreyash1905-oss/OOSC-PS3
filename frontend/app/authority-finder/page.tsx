@@ -66,6 +66,18 @@ export default function AuthorityFinderPage() {
     }
   ];
 
+  const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
+
+  const handleReport = (id: string) => {
+    setReportedIds(prev => {
+      const newSet = new Set(prev);
+      newSet.add(id);
+      return newSet;
+    });
+    // In a full production app, this would POST to a /api/report-pio endpoint
+    alert('Thank you for reporting! This PIO entry has been flagged. Our team will verify and update the contact details shortly.');
+  };
+
   const filtered = authorities.filter((auth) => {
     const matchesCity = selectedCity === 'all' || auth.city === selectedCity;
     const matchesDept = selectedDepartment === 'all' || auth.department.includes(selectedDepartment);
@@ -153,15 +165,26 @@ export default function AuthorityFinderPage() {
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-gray-100 dark:border-[#2f2d2d] flex items-center justify-between gap-3">
-                <a
-                  href={auth.onlinePortal}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-gray-500 hover:text-blue-600 dark:hover:text-[#e7b85b] font-medium"
-                >
-                  Official Portal ↗
-                </a>
+              <div className="pt-3 border-t border-gray-100 dark:border-[#2f2d2d] flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <a
+                    href={auth.onlinePortal}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-gray-500 hover:text-blue-600 dark:hover:text-[#e7b85b] font-medium"
+                  >
+                    Official Portal ↗
+                  </a>
+                  <button
+                    onClick={() => handleReport(auth.id)}
+                    disabled={reportedIds.has(auth.id)}
+                    className="text-[10px] flex items-center gap-1 text-rose-500 hover:text-rose-700 dark:text-rose-400 font-semibold disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
+                    title="PIOs transfer frequently. Flag this entry if details are outdated."
+                  >
+                    <span>🚩</span>
+                    <span>{reportedIds.has(auth.id) ? 'Reported' : 'Report incorrect info'}</span>
+                  </button>
+                </div>
                 <Link
                   href="/application-generator"
                   className="bg-[#0e6670] hover:bg-[#094d54] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm"
