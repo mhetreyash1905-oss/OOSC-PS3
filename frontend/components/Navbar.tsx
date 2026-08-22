@@ -12,7 +12,7 @@ export default function Navbar() {
   const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, fontSize, changeFontSize } = useTheme();
 
   const isAuth = user !== null;
   const email = user?.email ?? null;
@@ -106,6 +106,20 @@ export default function Navbar() {
           </div>
 
           <div className="hidden lg:flex items-center space-x-3">
+            {/* Translation Element */}
+            <div id="google_translate_element" className="h-8 flex items-center overflow-hidden [&_.goog-te-gadget]:text-[0px] [&_.goog-te-combo]:text-sm [&_.goog-te-combo]:p-1 [&_.goog-te-combo]:rounded-md [&_.goog-te-combo]:border-gray-200 dark:[&_.goog-te-combo]:border-[#444] dark:[&_.goog-te-combo]:bg-[#2d2a2a] dark:[&_.goog-te-combo]:text-white"></div>
+            
+            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
+            {/* Font Size Controls */}
+            <div className="flex items-center gap-1 bg-[#eef4f1] dark:bg-[#2d2a2a] p-1 rounded-lg">
+              <button onClick={() => changeFontSize('sm')} className={`px-2 py-0.5 rounded text-sm font-semibold transition-colors ${fontSize === 'sm' ? 'bg-white dark:bg-[#444] text-[#0e6670] dark:text-[#78c4c2] shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>A-</button>
+              <button onClick={() => changeFontSize('base')} className={`px-2 py-0.5 rounded text-sm font-semibold transition-colors ${fontSize === 'base' ? 'bg-white dark:bg-[#444] text-[#0e6670] dark:text-[#78c4c2] shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>A</button>
+              <button onClick={() => changeFontSize('lg')} className={`px-2 py-0.5 rounded text-sm font-semibold transition-colors ${fontSize === 'lg' ? 'bg-white dark:bg-[#444] text-[#0e6670] dark:text-[#78c4c2] shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>A+</button>
+            </div>
+
+            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}

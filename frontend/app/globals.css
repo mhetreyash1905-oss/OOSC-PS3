@@ -68,3 +68,27 @@ html.dark body {
 .input-field {
   @apply w-full px-4 py-3 border border-[#cbd8d4] bg-white rounded-lg focus:ring-2 focus:ring-[#e7b85b] focus:border-[#0e6670] outline-none transition-all duration-200 placeholder:text-[#8a9898];
 }
+
+/* Hide the annoying Google Translate top banner and prevent body shift */
+.skiptranslate > iframe.skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+}
+body {
+  top: 0px !important;
+}
+#google_translate_element select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #dce3df;
+  background-color: white;
+  cursor: pointer;
+  outline: none;
+}
+html.dark #google_translate_element select {
+  background-color: #2d2a2a;
+  border-color: #444;
+  color: white;
+}
