@@ -61,6 +61,69 @@ export default function ResourcesPage() {
           type: 'Petition Draft'
         }
       ]
+    },
+    {
+      title: 'Consumer & Digital Rights',
+      icon: '🛒',
+      items: [
+        {
+          name: 'Consumer Protection Act 2019',
+          desc: 'Covers e-commerce fraud, unfair trade practices, and district commission grievances (Sections 2(7), 2(47), 39).',
+          type: 'Statutory Act'
+        },
+        {
+          name: 'DPDP Act 2023 & IT Act',
+          desc: 'Guidelines for data deletion, opt-out demands, spam callers, and unauthorized data brokers.',
+          type: 'Statutory Act'
+        },
+        {
+          name: 'Motor Vehicles Amendment Act',
+          desc: 'Grievance protocols for unfair e-challans, towing disputes, and third-party insurance claims.',
+          type: 'Statutory Act'
+        }
+      ]
+    },
+    {
+      title: 'Labor, Healthcare & Education',
+      icon: '💼',
+      items: [
+        {
+          name: 'Labour & Employment Laws',
+          desc: 'Industrial Disputes Act (retrenchment) and Maternity Benefit Act guidelines for gig workers and employees.',
+          type: 'Statutory Act'
+        },
+        {
+          name: 'Charter of Patient Rights (MoHFW)',
+          desc: 'Medical negligence rights, emergency care, and rules against withholding bodies for unpaid bills.',
+          type: 'Statutory Act'
+        },
+        {
+          name: 'RTE Act 2009',
+          desc: 'Right to Education Act covering mandatory 25% EWS quota and protection against capitation fees.',
+          type: 'Statutory Act'
+        }
+      ]
+    },
+    {
+      title: 'Social Welfare & Public Services',
+      icon: '🏛️',
+      items: [
+        {
+          name: 'Right to Public Services Legislation',
+          desc: 'Penalty structures and time-bound delivery guarantees for essential documents across major Indian states.',
+          type: 'Statutory Act'
+        },
+        {
+          name: 'NFSA & RPwD Acts',
+          desc: 'Food Security (Ration/PDS grievances) and Rights of Persons with Disabilities (Accessibility standards).',
+          type: 'Statutory Act'
+        },
+        {
+          name: 'Environmental & Nuisance Laws',
+          desc: 'BNS/IPC and Air/Water Act remedies for illegal dust, noise pollution, and chemical dumping.',
+          type: 'Statutory Act'
+        }
+      ]
     }
   ];
 
