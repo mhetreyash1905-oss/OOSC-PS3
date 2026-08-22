@@ -9,9 +9,8 @@ export default function LoadingScreen() {
 
   useEffect(() => {
     let current = 1;
-    // Total duration ~3.8 seconds for smooth 1% to 100% progression
-    const totalSteps = 99;
-    const intervalTime = 38; // 38ms * 100 steps ≈ 3.8 seconds
+    // Total duration ~1.8 - 2.0 seconds for smooth 1% to 100% progression
+    const intervalTime = 18; // 18ms * 100 steps ≈ 1.8s
 
     const timer = setInterval(() => {
       current += 1;
@@ -21,15 +20,15 @@ export default function LoadingScreen() {
         setProgress(100);
         clearInterval(timer);
 
-        // When reaching 100%, hold briefly then open the website with a smooth fade
+        // Hold briefly at 100% then fade out smoothly
         setTimeout(() => {
           setIsFading(true);
-        }, 300);
+        }, 150);
 
-        // Complete transition and hide loading screen
+        // Remove from DOM after fade animation completes
         setTimeout(() => {
           setIsVisible(false);
-        }, 800);
+        }, 650);
       } else {
         setProgress(current);
       }
@@ -42,7 +41,7 @@ export default function LoadingScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#3b82f6] text-black transition-opacity duration-500 ease-in-out ${
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#14505b] text-white transition-opacity duration-500 ease-in-out bg-[radial-gradient(rgba(255,255,255,0.18)_1.5px,transparent_1.5px)] [background-size:32px_32px] ${
         isFading ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
@@ -50,15 +49,15 @@ export default function LoadingScreen() {
         {/* Top Percentage & Line Container */}
         <div className="w-full relative mb-4">
           <div className="flex justify-end mb-2">
-            <span className="font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tighter text-black font-mono">
+            <span className="font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tighter text-[#e7b85b] font-mono">
               {progress}%
             </span>
           </div>
 
           {/* Line Track */}
-          <div className="w-full h-[4px] bg-black/20 rounded-full overflow-hidden">
+          <div className="w-full h-[4px] bg-white/20 rounded-full overflow-hidden">
             <div
-              className="h-full bg-black transition-all duration-75 ease-linear"
+              className="h-full bg-[#e7b85b] transition-all duration-75 ease-linear"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -66,7 +65,7 @@ export default function LoadingScreen() {
 
         {/* Large Bold Brand Title */}
         <div className="w-full">
-          <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] font-black uppercase tracking-tighter text-black leading-none select-none font-sans">
+          <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] font-black uppercase tracking-tighter text-white leading-none select-none font-sans drop-shadow-sm">
             CIVIC SAATHI
           </h1>
         </div>
