@@ -17,6 +17,7 @@ import { auth } from './firebase';
  * Sign in an existing user with email + password.
  */
 export async function loginWithEmail(email: string, password: string): Promise<User> {
+  if (!auth) throw new Error("Firebase is not configured. Please set NEXT_PUBLIC_FIREBASE_* in your .env.local file.");
   const credential = await signInWithEmailAndPassword(auth, email, password);
   return credential.user;
 }
@@ -25,6 +26,7 @@ export async function loginWithEmail(email: string, password: string): Promise<U
  * Create a new Firebase account with email + password.
  */
 export async function registerWithEmail(email: string, password: string): Promise<User> {
+  if (!auth) throw new Error("Firebase is not configured. Please set NEXT_PUBLIC_FIREBASE_* in your .env.local file.");
   const credential = await createUserWithEmailAndPassword(auth, email, password);
   return credential.user;
 }
@@ -36,6 +38,7 @@ export async function registerWithEmail(email: string, password: string): Promis
  * Works for both new and existing users — Firebase handles the distinction.
  */
 export async function loginWithGoogle(): Promise<User> {
+  if (!auth) throw new Error("Firebase is not configured. Please set NEXT_PUBLIC_FIREBASE_* in your .env.local file.");
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   const credential = await signInWithPopup(auth, provider);
@@ -48,7 +51,9 @@ export async function loginWithGoogle(): Promise<User> {
  * Sign out the current user. Firebase clears the IndexedDB session.
  */
 export async function logout(): Promise<void> {
-  await signOut(auth);
+  if (auth) {
+    await signOut(auth);
+  }
   window.location.href = '/login';
 }
 
@@ -58,6 +63,7 @@ export async function logout(): Promise<void> {
  * Returns null if no user is signed in.
  */
 export async function getIdToken(): Promise<string | null> {
+  if (!auth) return null;
   const user = auth.currentUser;
   if (!user) return null;
   return user.getIdToken();
@@ -68,6 +74,7 @@ export async function getIdToken(): Promise<string | null> {
  * NOTE: This is a point-in-time snapshot. Use onAuthChange for reactive state.
  */
 export function getCurrentUser(): User | null {
+  if (!auth) return null;
   return auth.currentUser;
 }
 
@@ -78,6 +85,11 @@ export function getCurrentUser(): User | null {
  * Returns the unsubscribe function.
  */
 export function onAuthChange(callback: (user: User | null) => void): () => void {
+  if (!auth) {
+    // If Firebase isn't initialized, immediately resolve to unauthenticated.
+    setTimeout(() => callback(null), 0);
+    return () => {};
+  }
   return onAuthStateChanged(auth, callback);
 }
 
@@ -85,5 +97,6 @@ export function onAuthChange(callback: (user: User | null) => void): () => void 
  * Get the current user's email (point-in-time, may be null before Firebase resolves).
  */
 export function getUserEmail(): string | null {
+  if (!auth) return null;
   return auth.currentUser?.email ?? null;
 }

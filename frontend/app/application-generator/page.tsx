@@ -2,8 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/components/AuthProvider';
+import { getIdToken } from '@/lib/auth';
 
 export default function ApplicationGeneratorPage() {
+  const { user } = useAuth();
+  
+  // AI Drafting State
+  const [issueDescription, setIssueDescription] = useState('');
+  const [isDraftingAI, setIsDraftingAI] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const [docType, setDocType] = useState<'rti' | 'landlord_notice' | 'municipal'>('rti');
   
   // Form State
@@ -32,10 +41,47 @@ export default function ApplicationGeneratorPage() {
     }
   };
 
+  const handleDraftWithAI = async () => {
+    if (!issueDescription.trim()) return;
+    setIsDraftingAI(true);
+    setErrorMsg(null);
+    try {
+      const token = await getIdToken();
+      if (!token) throw new Error("Please log in to use AI generation.");
+      
+      const res = await fetch('http://localhost:8000/platform/generate-document', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ issue_description: issueDescription })
+      });
+      if (!res.ok) {
+        let errStr = "Failed to generate document";
+        try {
+          const errData = await res.json();
+          if (errData.detail) errStr = errData.detail;
+        } catch(e) {}
+        throw new Error(errStr);
+      }
+      const data = await res.json();
+      
+      setDocType(data.doc_type);
+      setAuthority(data.authority);
+      setSubject(data.subject);
+      setParticulars(data.particulars);
+      
+    } catch (e: any) {
+      setErrorMsg(e.message || "An error occurred.");
+    } finally {
+      setIsDraftingAI(false);
+    }
+  };
+
   const handleDownloadPDF = () => {
     setGenerating(true);
     setTimeout(() => {
-      // Simulate client PDF download window
       window.print();
       setGenerating(false);
     }, 600);
@@ -55,7 +101,7 @@ export default function ApplicationGeneratorPage() {
               Application & RTI Generator
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Format statutory Section 6(1) RTI applications, Landlord Demand Notices, and Municipal Petitions ready for submission.
+              Explain your issue below. Our AI will analyze the facts and format a statutory Section 6(1) RTI, Demand Notice, or Municipal Petition ready for submission.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -80,11 +126,51 @@ export default function ApplicationGeneratorPage() {
           </div>
         </div>
 
+        {/* AI Input Section */}
+        <div className="bg-white dark:bg-[#201e1e] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-sm">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+            <span>🤖</span> Step 1: Explain Your Issue
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Briefly describe your problem (e.g., "The streetlights in my area have been broken for 3 months despite complaints" or "My landlord is withholding my deposit for painting charges").
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <textarea
+              rows={3}
+              value={issueDescription}
+              onChange={(e) => setIssueDescription(e.target.value)}
+              placeholder="Explain your situation here..."
+              className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670] resize-none"
+            />
+            <button
+              onClick={handleDraftWithAI}
+              disabled={isDraftingAI || !issueDescription.trim()}
+              className="whitespace-nowrap bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center gap-2 self-start sm:self-stretch"
+            >
+              {isDraftingAI ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Analyzing...</span>
+                </>
+              ) : (
+                <>
+                  <span>✨</span>
+                  <span>Draft Application</span>
+                </>
+              )}
+            </button>
+          </div>
+          {errorMsg && <p className="text-rose-500 text-xs font-semibold mt-2">{errorMsg}</p>}
+        </div>
+
         {/* Generator Main Grid: Form Left, Preview Right */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Side */}
           <div className="bg-white dark:bg-[#201e1e] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-sm space-y-5">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Configure Details</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <span>✍️</span> Step 2: Review & Edit Details
+            </h2>
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
@@ -187,7 +273,7 @@ export default function ApplicationGeneratorPage() {
               </div>
 
               <div className="text-xs space-y-1">
-                <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+                <p suppressHydrationWarning><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
                 <p><strong>From:</strong> {applicantName}</p>
                 <p><strong>Address:</strong> {address}</p>
               </div>

@@ -11,12 +11,17 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-if (Object.values(firebaseConfig).some((value) => !value)) {
-  throw new Error('Firebase configuration is missing. Set the NEXT_PUBLIC_FIREBASE_* environment variables.');
+const requiredKeys = ['apiKey', 'authDomain', 'projectId'];
+const missingKeys = requiredKeys.filter((key) => !(firebaseConfig as any)[key]);
+
+if (missingKeys.length > 0) {
+  console.warn(`Firebase config is missing required keys: ${missingKeys.join(', ')}. Please set NEXT_PUBLIC_FIREBASE_* environment variables. Authentication will be disabled.`);
 }
 
 // Prevent re-initialization on hot reload
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app = missingKeys.length === 0 
+  ? (getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0])
+  : null;
 
-export const auth = getAuth(app);
+export const auth = app ? getAuth(app) : (null as any);
 export default app;
