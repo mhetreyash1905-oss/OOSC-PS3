@@ -536,14 +536,15 @@ export default function PlatformPage() {
           /* Landing / Hero State (ChatGPT style) */
           <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-8 overflow-y-auto">
             <div className="w-full max-w-3xl text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-[#2d2a2a] text-blue-700 dark:text-orange-400 text-xs font-semibold mb-4 border border-blue-100 dark:border-[#3d3a3a]">
-                <span>🤖</span> AI Civic & Legal Assistant
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-500/10 via-[#0e6670]/10 to-[#e7b85b]/10 dark:bg-[#252323] text-[#0e6670] dark:text-[#e7b85b] text-xs font-bold mb-5 border border-[#0e6670]/20 dark:border-[#e7b85b]/30 shadow-sm backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span>✨ Gemini 3.6 Statutory RAG Engine • Active</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-3">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-3 font-sans">
                 👋 Hi! What civic or legal problem can I help you with?
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
-                Describe your problem in plain language, Hindi, or Hinglish. CivicSaathi will identify your rights, provide immediate actionable steps, and help you draft official notices and RTIs.
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                Describe your problem in simple language, Hindi, or Hinglish. CivicSaathi will identify your rights, provide immediate actionable steps, and help you draft official notices and RTIs.
               </p>
             </div>
 
