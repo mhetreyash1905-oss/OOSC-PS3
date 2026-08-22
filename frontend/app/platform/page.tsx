@@ -277,6 +277,23 @@ export default function PlatformPage() {
     }
   };
 
+  const submitRightsClarification = async (answer: string) => {
+    if (!sessionId) return;
+    setIsGeneratingRights(true);
+    setErrorMsg(null);
+    try {
+      const data = await apiFetch<any>('/platform/rights/clarify', { 
+        method: 'POST', 
+        body: { session_id: sessionId, answer } 
+      });
+      setRightsData(data);
+    } catch(error) {
+      setErrorMsg('Failed to submit clarification.');
+    } finally {
+      setIsGeneratingRights(false);
+    }
+  };
+
   const fetchRecommendation = async (sid: string) => {
     setIsGeneratingRecommendation(true);
     setErrorMsg(null);
@@ -881,6 +898,36 @@ export default function PlatformPage() {
                               Retrieving statutory sections & case law from knowledge base...
                             </p>
                           </div>
+                        ) : rightsData.clarification_question ? (
+                          <div className="py-6 px-4 md:px-8">
+                            <div className="bg-amber-50 dark:bg-[#382d1c] border border-amber-200 dark:border-[#524128] rounded-2xl p-6 mb-6">
+                              <h3 className="text-lg font-bold text-amber-900 dark:text-amber-500 mb-2">
+                                CivicSaathi Needs More Details
+                              </h3>
+                              <p className="text-gray-800 dark:text-gray-200 text-[15px]">
+                                {rightsData.clarification_question}
+                              </p>
+                            </div>
+                            
+                            <form 
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                const ans = (e.currentTarget.elements.namedItem('clarifyAns') as HTMLInputElement).value;
+                                if(ans.trim()) submitRightsClarification(ans);
+                              }}
+                              className="flex gap-3"
+                            >
+                              <input 
+                                name="clarifyAns"
+                                type="text"
+                                placeholder="Your answer..."
+                                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1919] rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                              />
+                              <button type="submit" className="px-5 py-2.5 bg-[#0e6670] hover:bg-[#084951] dark:bg-[#78c4c2] dark:hover:bg-[#5bb2b0] dark:text-[#102a2e] text-white font-semibold text-sm rounded-xl shadow-md transition-all">
+                                Submit
+                              </button>
+                            </form>
+                          </div>
                         ) : (
                           <>
                             <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
@@ -899,7 +946,7 @@ export default function PlatformPage() {
                               </button>
                               <button
                                 onClick={() => setStep(3)}
-                                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-md transition-all"
+                                className="inline-flex items-center gap-2 bg-[#0e6670] hover:bg-[#084951] dark:bg-[#78c4c2] dark:hover:bg-[#5bb2b0] dark:text-[#102a2e] text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-md transition-all"
                               >
                                 <span>View Recommended Legal Action</span>
                                 <span>→</span>

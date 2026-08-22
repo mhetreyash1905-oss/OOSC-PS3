@@ -184,16 +184,55 @@ async def rights(request: SessionRequest, current_user: dict = Depends(get_curre
         from app.agents.rights_navigator import generate_rights_explanation
         explanation_data = await generate_rights_explanation(session["intake"])
         
+        status_update = "recommendation" if not explanation_data.get("clarification_question") else "rights"
+
         await sessions_collection.update_one(
             {"_id": session_id},
             {"$set": {
                 "rights_explanation": explanation_data,
-                "status": "recommendation"
+                "status": status_update
             }}
         )
         return explanation_data
     
     return session["rights_explanation"]
+
+class RightsClarifyRequest(BaseModel):
+    session_id: str
+    answer: str
+
+@router.post("/rights/clarify")
+async def rights_clarify(request: RightsClarifyRequest, current_user: dict = Depends(get_current_user)):
+    try:
+        session_id = ObjectId(request.session_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid session_id format")
+
+    session = await sessions_collection.find_one({"_id": session_id, "user_id": current_user["user_id"]})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    if session["status"] != "rights" or not session.get("rights_explanation", {}).get("clarification_question"):
+        raise HTTPException(status_code=400, detail="No active clarification question")
+
+    # Append the answer to intake facts
+    new_facts = session["intake"].get("facts", "") + f"\n\n[Clarification] Q: {session['rights_explanation']['clarification_question']}\nA: {request.answer}"
+    session["intake"]["facts"] = new_facts
+    
+    from app.agents.rights_navigator import generate_rights_explanation
+    explanation_data = await generate_rights_explanation(session["intake"])
+    
+    status_update = "recommendation" if not explanation_data.get("clarification_question") else "rights"
+
+    await sessions_collection.update_one(
+        {"_id": session_id},
+        {"$set": {
+            "intake": session["intake"],
+            "rights_explanation": explanation_data,
+            "status": status_update
+        }}
+    )
+    return explanation_data
 
 @router.post("/recommend")
 async def recommend(request: SessionRequest, current_user: dict = Depends(get_current_user)):

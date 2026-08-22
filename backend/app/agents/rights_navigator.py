@@ -20,8 +20,9 @@ class Citation(BaseModel):
     text: str = Field(description="A short snippet of the exact text supporting the claim.")
 
 class RightsResponse(BaseModel):
-    explanation: str = Field(description="Plain language explanation of rights. MUST include inline citations like [Source: 1]. MUST end with the disclaimer.")
-    citations: list[Citation] = Field(description="List of all citations used in the explanation.")
+    clarification_question: str | None = Field(description="If confidence is borderline and you need one crucial fact to give an accurate explanation (e.g. 'Is your landlord a private individual or a company?'), ask it here. Otherwise, leave null.")
+    explanation: str | None = Field(description="Plain language explanation of rights. MUST include inline citations like [Source: 1]. Leave null if asking a clarification_question.")
+    citations: list[Citation] | None = Field(description="List of all citations used in the explanation. Leave null if asking a clarification_question.")
     confidence: str = Field(description="Confidence level: 'high', 'medium', or 'low' based on how well the chunks cover the user's situation.")
 
 SYSTEM_PROMPT = """You are a legal rights explainer for the Civic Rights Navigator.
@@ -33,9 +34,10 @@ RULES FOR GROUNDING:
 3. Pay attention to the metadata of the provided chunks:
    - If a chunk's `source_type` is `"verbatim_statute"`, it contains the exact text of the law. You should quote from it or treat it as legally binding statute.
    - If a chunk's `source_type` is `"general_explainer"`, it is a helpful summary or guide, but it is NOT the official law. Do not treat it as a verbatim statute.
-4. If the provided chunks do not cover the user's specific situation, clearly state: "I don't have sufficient legal text in my knowledge base to address this specific point." and flag confidence as 'low'.
-5. YOU ARE STRICTLY PROHIBITED FROM PREDICTING LEGAL OUTCOMES. If the user asks if they will win, you MUST explicitly state: "I cannot predict the outcome of any legal case or tell you if you will win. I can only explain your rights."
-6. You MUST end your explanation with this exact disclaimer: "This explains general rights under relevant laws. It is not a substitute for a lawyer."
+4. If the provided chunks do not cover the user's specific situation, and you cannot answer, flag confidence as 'low'.
+5. **MULTI-TURN CLARIFICATION**: If the retrieved chunks contain relevant laws, but you need ONE crucial detail from the user to determine which section applies (e.g. "Is the company registered in India?"), output a `clarification_question`. Do not generate the explanation yet.
+6. YOU ARE STRICTLY PROHIBITED FROM PREDICTING LEGAL OUTCOMES. If the user asks if they will win, you MUST explicitly state: "I cannot predict the outcome of any legal case or tell you if you will win. I can only explain your rights."
+7. You MUST end your explanation with this exact disclaimer: "This explains general rights under relevant laws. It is not a substitute for a lawyer."
 
 Provided Legal Chunks:
 {chunks_text}
