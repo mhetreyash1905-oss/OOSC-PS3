@@ -24,21 +24,21 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white dark:bg-[#1a1919] border-b border-gray-200 dark:border-[#333] shadow-sm transition-colors duration-200">
+    <nav className="sticky top-0 z-50 bg-[#fbfcf9]/95 dark:bg-[#1a1919]/95 backdrop-blur border-b border-[#dce3df] dark:border-[#333] shadow-[0_4px_20px_rgba(24,37,43,0.05)] transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2">
-              <svg className="w-8 h-8 text-blue-700 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <svg className="w-8 h-8 text-[#0e6670] dark:text-[#78c4c2] transition-transform group-hover:-rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11V7a4 4 0 018 0v4m0 4.5c.01.2.02.4.02.61m-6.6-4.5c-.244.2-.472.417-.687.649m4.936-2.27c.45-.632.78-1.353 1.05-2.126m0 0C15.82 8.784 16 7.915 16 7m0 0c0-1.871-.655-3.59-1.75-4.94M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"></path>
               </svg>
-              <span className="font-bold text-xl text-blue-700 dark:text-blue-400">Civic Rights Navigator</span>
+              <span className="font-bold text-lg sm:text-xl tracking-tight text-[#0e6670] dark:text-[#78c4c2]">Civic Rights Navigator</span>
             </Link>
-            <div className="hidden md:ml-10 md:flex md:space-x-8">
-              <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Home</Link>
-              <Link href="/about" className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">About</Link>
+            <div className="hidden md:ml-10 md:flex md:items-center md:gap-2">
+              <Link href="/" className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${pathname === '/' ? 'text-[#0e6670] bg-[#dcefeb]' : 'text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1]'}`}>Home</Link>
+              <Link href="/about" className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${pathname === '/about' ? 'text-[#0e6670] bg-[#dcefeb]' : 'text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1]'}`}>About</Link>
               {isAuth && (
-                <Link href="/platform" className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Platform</Link>
+                <Link href="/platform" className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${pathname === '/platform' ? 'text-[#0e6670] bg-[#dcefeb]' : 'text-gray-600 dark:text-gray-300 hover:text-[#0e6670] hover:bg-[#eef4f1]'}`}>Platform</Link>
               )}
             </div>
           </div>
@@ -46,7 +46,7 @@ export default function Navbar() {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2d2a2a] transition-colors"
+              className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-[#eef4f1] dark:hover:bg-[#2d2a2a] transition-colors"
               title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
             >
               {theme === 'light' ? (
@@ -67,7 +67,7 @@ export default function Navbar() {
                       <p className="text-sm leading-5 text-gray-900 dark:text-gray-200 font-medium truncate">{email}</p>
                     </div>
                     <div className="py-1">
-                      <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#3d3a3a]">Settings</Link>
+                      <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#eef4f1] dark:hover:bg-[#3d3a3a]">Settings</Link>
                       <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-[#3d3a3a]">Logout</button>
                     </div>
                   </div>

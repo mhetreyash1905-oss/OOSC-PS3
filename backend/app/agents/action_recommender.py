@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import asyncio
 from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
@@ -22,7 +23,8 @@ async def generate_recommendation(intake_data: dict, rights_data: dict) -> dict:
     user_msg = f"Facts: {json.dumps(intake_data)}\nRights Explained: {rights_data.get('explanation')}"
     
     try:
-        response = client.models.generate_content(
+        response = await asyncio.to_thread(
+            client.models.generate_content,
             model='gemini-2.5-flash-lite',
             contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_msg)])],
             config=types.GenerateContentConfig(

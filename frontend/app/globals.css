@@ -3,40 +3,68 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #171717;
-  --background: #ffffff;
-  --primary: #1e40af;
-  --primary-light: #3b82f6;
-  --primary-dark: #1e3a8a;
-  --secondary: #059669;
-  --accent: #f59e0b;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --card-bg: #f9fafb;
+  --foreground: #18252b;
+  --background: #f6f7f3;
+  --primary: #0e6670;
+  --primary-light: #2b8d91;
+  --primary-dark: #084951;
+  --secondary: #d77a3e;
+  --accent: #e7b85b;
+  --muted: #637177;
+  --border: #dce3df;
+  --card-bg: #ffffff;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  background-image: radial-gradient(circle at 10% 0%, rgba(231, 184, 91, 0.12), transparent 28rem), linear-gradient(135deg, #f6f7f3 0%, #eef4f1 100%);
+}
+
+html.dark body {
+  color: #e8efec;
+  background-color: #122125;
+  background-image: radial-gradient(circle at 10% 0%, rgba(231, 184, 91, 0.08), transparent 28rem), linear-gradient(135deg, #122125 0%, #172d30 100%);
+}
+
+::selection {
+  background: rgba(14, 102, 112, 0.2);
+}
+
+*:focus-visible {
+  outline: 3px solid rgba(231, 184, 91, 0.9);
+  outline-offset: 3px;
+}
+
+.page-shell {
+  min-height: calc(100vh - 4rem);
+}
+
+.eyebrow {
+  color: var(--secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .chat-bubble-user {
-  @apply bg-blue-600 text-white rounded-2xl rounded-br-sm px-4 py-3 max-w-[80%] ml-auto;
+  @apply bg-[#0e6670] text-white rounded-2xl rounded-br-sm px-4 py-3 max-w-[80%] ml-auto shadow-sm;
 }
 
 .chat-bubble-agent {
-  @apply bg-gray-100 text-gray-900 rounded-2xl rounded-bl-sm px-4 py-3 max-w-[80%];
+  @apply bg-white text-[#18252b] rounded-2xl rounded-bl-sm px-4 py-3 max-w-[80%] shadow-sm border border-[#dce3df];
 }
 
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply bg-[#0e6670] hover:bg-[#084951] text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .btn-secondary {
-  @apply bg-white hover:bg-gray-50 text-blue-600 font-semibold py-2.5 px-6 rounded-lg border-2 border-blue-600 transition-colors duration-200;
+  @apply bg-white hover:bg-[#eef4f1] text-[#0e6670] font-semibold py-2.5 px-6 rounded-lg border border-[#9bbdb9] transition-all duration-200;
 }
 
 .input-field {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200;
+  @apply w-full px-4 py-3 border border-[#cbd8d4] bg-white rounded-lg focus:ring-2 focus:ring-[#e7b85b] focus:border-[#0e6670] outline-none transition-all duration-200 placeholder:text-[#8a9898];
 }
