@@ -6,6 +6,8 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { ThemeProvider } from '@/lib/theme';
 import { AuthProvider } from '@/components/AuthProvider';
 
+import Script from 'next/script';
+
 export const metadata: Metadata = {
   title: 'CivicSaathi — AI Civic & Legal Rights Navigator',
   description: 'Understand your rights under Indian law. File RTIs, resolve tenancy disputes, and address municipal service grievances with AI-powered assistance.',
@@ -30,18 +32,26 @@ export default function RootLayout({
           </AuthProvider>
         </ThemeProvider>
         
-        <script type="text/javascript" dangerouslySetInnerHTML={{
-          __html: `
-            function googleTranslateElementInit() {
-              new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'hi,en',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-              }, 'google_translate_element');
-            }
-          `
-        }} />
-        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+        <Script
+          id="google-translate-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                  pageLanguage: 'en',
+                  includedLanguages: 'hi,en',
+                  layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                }, 'google_translate_element');
+              }
+            `
+          }}
+        />
+        <Script 
+          id="google-translate-script"
+          strategy="afterInteractive" 
+          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" 
+        />
       </body>
     </html>
   );

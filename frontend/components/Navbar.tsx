@@ -38,7 +38,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-[#fbfcf9]/95 dark:bg-[#1a1919]/95 backdrop-blur border-b border-[#dce3df] dark:border-[#333] shadow-[0_4px_20px_rgba(24,37,43,0.05)] transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2.5 group">
@@ -107,7 +107,7 @@ export default function Navbar() {
 
           <div className="hidden lg:flex items-center space-x-3">
             {/* Translation Element */}
-            <div id="google_translate_element" className="h-8 flex items-center overflow-hidden [&_.goog-te-gadget]:text-[0px] [&_.goog-te-combo]:text-sm [&_.goog-te-combo]:p-1 [&_.goog-te-combo]:rounded-md [&_.goog-te-combo]:border-gray-200 dark:[&_.goog-te-combo]:border-[#444] dark:[&_.goog-te-combo]:bg-[#2d2a2a] dark:[&_.goog-te-combo]:text-white"></div>
+            <div id="google_translate_element"></div>
             
             <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
 

@@ -69,7 +69,7 @@ html.dark body {
   @apply w-full px-4 py-3 border border-[#cbd8d4] bg-white rounded-lg focus:ring-2 focus:ring-[#e7b85b] focus:border-[#0e6670] outline-none transition-all duration-200 placeholder:text-[#8a9898];
 }
 
-/* Hide the annoying Google Translate top banner and prevent body shift */
+/* --- Google Translate Widget Modernization --- */
 .skiptranslate > iframe.skiptranslate {
   display: none !important;
   visibility: hidden !important;
@@ -77,18 +77,47 @@ html.dark body {
 body {
   top: 0px !important;
 }
-#google_translate_element select {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 1px solid #dce3df;
-  background-color: white;
-  cursor: pointer;
-  outline: none;
+#google_translate_element {
+  display: flex;
+  align-items: center;
 }
-html.dark #google_translate_element select {
-  background-color: #2d2a2a;
-  border-color: #444;
-  color: white;
+.goog-te-gadget {
+  font-size: 0px !important; /* Hides "Powered by" */
+  color: transparent !important;
+  display: flex;
+  align-items: center;
 }
+.goog-te-gadget img, .goog-logo-link {
+  display: none !important; /* Hides Google logo */
+}
+.goog-te-combo {
+  font-size: 14px !important;
+  color: #18252b !important;
+  background-color: #eef4f1 !important;
+  border: 1px solid #dce3df !important;
+  padding: 4px 28px 4px 10px !important;
+  border-radius: 6px !important;
+  height: 32px !important;
+  min-width: 100px;
+  outline: none !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+  background-size: 14px !important;
+  transition: all 0.2s ease;
+}
+.goog-te-combo:hover {
+  border-color: #0e6670 !important;
+}
+html.dark .goog-te-combo {
+  background-color: #2d2a2a !important;
+  color: #e8efec !important;
+  border-color: #444 !important;
+}
+html.dark .goog-te-combo:hover {
+  border-color: #78c4c2 !important;
+}
+/* ------------------------------------------- */
