@@ -18,7 +18,7 @@ class IntakeResponse(BaseModel):
     issue_detected: Optional[str] = Field(description="The detected issue title, e.g. 'Consumer & E-Commerce Dispute', 'Tenant–Landlord Dispute', 'Municipal Civic Service Issue', 'RTI & Public Records Request'.")
     issue_icon: Optional[str] = Field(description="An appropriate single emoji icon representing the issue, e.g. '🛍️' for consumer/e-commerce, '🏠' for tenancy, '🏛️' for municipal, '📜' for RTI, '⚖️' for legal.")
     suggested_actions: Optional[List[str]] = Field(description="A concise list of 3-5 immediate practical steps the user should consider.")
-    category: Optional[str] = Field(description="Must be 'consumer_dispute', 'tenant_dispute', 'municipal_civic', 'rti_request', 'labour_dispute', 'disability_rights', or 'out_of_scope'.")
+    category: Optional[str] = Field(description="Must be 'consumer_dispute', 'tenant_dispute', 'landlord_dispute', 'municipal_civic', 'rti_request', 'labour_dispute', 'disability_rights', or 'out_of_scope'.")
     location: Optional[str] = Field(description="City and State in India if identified or inferred.")
     facts: Optional[str] = Field(description="Clear summary of the user's issue facts.")
     desired_outcome: Optional[str] = Field(description="What the user wants to achieve.")
@@ -26,12 +26,13 @@ class IntakeResponse(BaseModel):
 
 SYSTEM_PROMPT = """You are CivicSaathi (Civic Rights Navigator), an intelligent AI Civic and Legal Assistant designed to assist Indian citizens with tenancy problems, municipal issues, RTI requests, consumer disputes (Flipkart/Amazon e-commerce refunds, defective products under Consumer Protection Act 2019), and civic rights.
 
-You can comprehend user inputs in English, Hindi, and Hinglish (e.g., "maine flipkart se 15000 ka laptop mangaya and wo broken tha, refund initiate nhi ho raha", "Mere landlord ne security deposit wapas nahi kiya", "Pani ki problem hai colony me").
+You can comprehend user inputs in English, Hindi, and Hinglish (e.g., "maine flipkart se 15000 ka laptop mangaya and wo broken tha, refund initiate nhi ho raha", "Mere landlord ne security deposit wapas nahi kiya", "Pani ki problem hai colony me", "Tenant rent nahi de raha").
 
 For EVERY user query:
 1. Identify the detected issue accurately:
    - Consumer / E-Commerce (Flipkart, Amazon, defective goods, refund refusal): issue_detected = "Consumer & E-Commerce Dispute (Defective Product / Refund Refusal)", issue_icon = "🛍️", category = "consumer_dispute".
-   - Tenancy / Landlord (deposit withholding, eviction notice): issue_detected = "Tenant–Landlord Dispute", issue_icon = "🏠", category = "tenant_dispute".
+   - Tenancy / Tenant-Side (deposit withholding, eviction notice): issue_detected = "Tenant–Landlord Dispute (Tenant Rights)", issue_icon = "🏠", category = "tenant_dispute".
+   - Tenancy / Landlord-Side (non-paying tenant, property damage, holdover): issue_detected = "Landlord–Tenant Dispute (Landlord Rights)", issue_icon = "🏢", category = "landlord_dispute".
    - Municipal / Civic (water contamination, road repair, streetlights): issue_detected = "Municipal Civic Service Issue", issue_icon = "🏛️", category = "municipal_civic".
    - RTI (government records, tenders): issue_detected = "RTI & Public Records Request", issue_icon = "📜", category = "rti_request".
 
@@ -41,6 +42,11 @@ For EVERY user query:
      2. "Lodge a formal complaint with Flipkart / Seller Grievance Officer"
      3. "File an online grievance on National Consumer Helpline (consumerhelpline.gov.in / Call 1915)"
      4. "Draft a legal notice under Consumer Protection Act 2019 for refund & compensation"
+   - For Landlords (landlord_dispute):
+     1. "Review the termination and eviction clauses in your registered rental agreement"
+     2. "Send a formal legal notice for unpaid rent or property vacation"
+     3. "Document evidence of unpaid dues or property damage"
+     4. "Prepare to approach the local Rent Controller or Civil Court if they fail to vacate"
 
 3. Provide an empathetic agent_message addressing their exact situation directly.
 4. Set is_complete = True if the user stated what happened.
@@ -89,17 +95,29 @@ async def process_intake_message(chat_history: List[dict], new_message: str) -> 
                 "Draft a legal notice under Consumer Protection Act 2019 for refund & compensation"
             ]
             msg = "I understand your situation. Under the Consumer Protection Act 2019 and E-Commerce Rules 2020, sellers and platforms are legally required to refund or replace defective products."
-        elif any(k in msg_lower for k in ["landlord", "rent", "deposit", "evict", "flat", "tenant", "agreement"]):
-            issue_title = "Tenant–Landlord Dispute"
-            issue_icon = "🏠"
-            cat = "tenant_dispute"
-            actions = [
-                "Review your rental agreement notice and deposit refund clauses",
-                "Send a formal written demand notice specifying a 15-day refund deadline",
-                "Preserve payment receipts, UPI statements, and key handover proofs",
-                "Approach the local Rent Controller or Small Causes Court if unresolved"
-            ]
-            msg = "I understand your situation. Security deposit withholding by landlords without valid justification is covered under tenancy legal frameworks."
+        elif any(k in msg_lower for k in ["landlord", "deposit", "evict", "flat", "tenant", "rent"]):
+            if "tenant" in msg_lower and ("not paying" in msg_lower or "damage" in msg_lower or "rent nahi" in msg_lower):
+                issue_title = "Landlord–Tenant Dispute (Landlord Rights)"
+                issue_icon = "🏢"
+                cat = "landlord_dispute"
+                actions = [
+                    "Review the termination and eviction clauses in your registered rental agreement",
+                    "Send a formal legal notice for unpaid rent or property vacation",
+                    "Document evidence of unpaid dues or property damage",
+                    "Prepare to approach the local Rent Controller or Civil Court if they fail to vacate"
+                ]
+                msg = "I understand your situation. Let me help you understand your rights as a property owner and landlord under the relevant tenancy frameworks."
+            else:
+                issue_title = "Tenant–Landlord Dispute (Tenant Rights)"
+                issue_icon = "🏠"
+                cat = "tenant_dispute"
+                actions = [
+                    "Review your rental agreement notice and deposit refund clauses",
+                    "Send a formal written demand notice specifying a 15-day refund deadline",
+                    "Preserve payment receipts, UPI statements, and key handover proofs",
+                    "Approach the local Rent Controller or Small Causes Court if unresolved"
+                ]
+                msg = "I understand your situation. Security deposit withholding by landlords without valid justification is covered under tenancy legal frameworks."
         elif any(k in msg_lower for k in ["water", "road", "drain", "garbage", "pipe", "street", "municipal", "bmc", "bbmp", "mcd"]):
             issue_title = "Municipal & Civic Service Issue"
             issue_icon = "🏛️"
