@@ -14,9 +14,10 @@ interface RightsExplanationProps {
   explanation: string;
   citations: Citation[];
   confidence: string;
+  contradictionWarning?: string;
 }
 
-export default function RightsExplanation({ explanation, citations, confidence }: RightsExplanationProps) {
+export default function RightsExplanation({ explanation, citations, confidence, contradictionWarning }: RightsExplanationProps) {
   
   // A helper to render the explanation text, replacing "[Source: X]" with styled tags
   const renderExplanationWithCitations = (text: string) => {
@@ -61,6 +62,20 @@ export default function RightsExplanation({ explanation, citations, confidence }
               <p className="text-sm text-amber-700 mt-1">
                 The provided legal knowledge base may not fully cover your specific situation. 
                 The explanation below is based on the closest available provisions.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {contradictionWarning && (
+        <div className="bg-rose-50 border-l-4 border-rose-500 p-4 mb-4">
+          <div className="flex">
+            <div className="text-rose-500 font-bold text-xl">⚠️</div>
+            <div className="ml-3">
+              <h3 className="text-sm font-bold text-rose-800">Conflicting Laws Detected</h3>
+              <p className="text-sm text-rose-700 mt-1 font-medium">
+                {contradictionWarning}
               </p>
             </div>
           </div>

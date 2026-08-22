@@ -936,6 +936,7 @@ export default function PlatformPage() {
                                 explanation={rightsData.explanation}
                                 citations={rightsData.citations}
                                 confidence={rightsData.confidence}
+                                contradictionWarning={rightsData.contradiction_warning}
                               />
                             </div>
                             <div className="mt-8 pt-4 border-t border-gray-100 dark:border-[#333] flex justify-between items-center">
