@@ -8,6 +8,8 @@ import { AuthProvider } from '@/components/AuthProvider';
 
 import Script from 'next/script';
 
+import GlobalCursorEffect from '@/components/GlobalCursorEffect';
+
 export const metadata: Metadata = {
   title: 'CivicSaathi — AI Civic & Legal Rights Navigator',
   description: 'Understand your rights under Indian law. File RTIs, resolve tenancy disputes, and address municipal service grievances with AI-powered assistance.',
@@ -21,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-[#fbfcf9] dark:bg-[#1a1919] text-gray-900 dark:text-gray-100 transition-colors duration-200">
+        <GlobalCursorEffect />
         <LoadingScreen />
         <ThemeProvider>
           <AuthProvider>

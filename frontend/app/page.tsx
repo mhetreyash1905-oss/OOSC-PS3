@@ -1,32 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import CursorParticleCanvas from '@/components/CursorParticleCanvas';
 
 export default function Home() {
   const [activeDemo, setActiveDemo] = useState<number>(0);
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setCursorPos({ x: e.clientX, y: e.clientY });
-      if (!isHovered) setIsHovered(true);
-    };
-
-    const handleMouseLeave = () => {
-      setIsHovered(false);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [isHovered]);
 
   const demoExamples = [
     {
@@ -139,15 +117,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 transition-colors duration-200 relative">
-      {/* Interactive Cursor Spotlight Overlay */}
-      <div
-        className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300 hidden md:block"
-        style={{
-          opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(600px circle at ${cursorPos.x}px ${cursorPos.y}px, rgba(14, 102, 112, 0.18), rgba(231, 184, 91, 0.08), transparent 80%)`
-        }}
-      />
-
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0b2b31] via-[#0e6670] to-[#124b55] text-white py-24 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:28px_28px]"></div>
