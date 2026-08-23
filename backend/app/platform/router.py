@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from datetime import datetime
+import json
 from bson import ObjectId
 from app.auth.dependencies import get_current_user
 from app.database import sessions_collection
@@ -15,6 +16,50 @@ class IntakeRequest(BaseModel):
 
 class SessionRequest(BaseModel):
     session_id: str
+
+class AuthorityRecommendationRequest(BaseModel):
+    state: str = Field(min_length=2, max_length=80)
+    pincode: str = Field(pattern=r"^\d{6}$")
+    problem: str = Field(min_length=3, max_length=1000)
+
+class AuthorityRecommendationResponse(BaseModel):
+    department: str
+    authority_level: str
+    service_categories: list[str]
+    complaint_guidance: str
+
+@router.post("/authority-recommendation", response_model=AuthorityRecommendationResponse)
+async def authority_recommendation(request: AuthorityRecommendationRequest):
+    """Use Gemini to identify only the services relevant to a citizen's problem."""
+    from google import genai
+    from google.genai import types
+    from app.config import GEMINI_API_KEY
+    import asyncio
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    prompt = """You identify the correct Indian public department for a citizen complaint.
+Return JSON only. Choose one primary department and authority level, then 2 to 5
+specific service categories that should be searched nearby for this exact problem.
+Do not list unrelated services. Do not invent an officer name, phone number, MLA,
+or government URL. Keep complaint guidance under 240 characters.
+Examples: electricity outage -> Electricity Distribution Company, service categories
+electricity complaint office and power substation; street crime -> Police Department,
+police station and women help desk; garbage -> Municipal Corporation, ward office
+and sanitation office.
+"""
+    user_message = f"State: {request.state}\nPIN code: {request.pincode}\nProblem: {request.problem}"
+    response = await asyncio.to_thread(
+        client.models.generate_content,
+        model="gemini-3.6-flash",
+        contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_message)])],
+        config=types.GenerateContentConfig(
+            system_instruction=prompt,
+            response_mime_type="application/json",
+            response_schema=AuthorityRecommendationResponse,
+            temperature=0.1,
+        ),
+    )
+    return json.loads(response.text)
 
 @router.get("/sessions/history")
 async def get_session_history(current_user: dict = Depends(get_current_user)):

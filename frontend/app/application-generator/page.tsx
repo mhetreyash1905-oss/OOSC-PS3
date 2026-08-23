@@ -1,15 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { getIdToken } from '@/lib/auth';
 
-export default function ApplicationGeneratorPage() {
+function ApplicationGeneratorContent() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   
   // AI Drafting State
-  const [issueDescription, setIssueDescription] = useState('');
+  const [issueDescription, setIssueDescription] = useState(() => searchParams.get('issue') || '');
   const [isDraftingAI, setIsDraftingAI] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -310,5 +312,13 @@ export default function ApplicationGeneratorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ApplicationGeneratorPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#fbfcf9] dark:bg-[#151414]" />}>
+      <ApplicationGeneratorContent />
+    </Suspense>
   );
 }

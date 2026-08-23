@@ -2,87 +2,165 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/api';
 
-interface Authority {
+interface LocalPlace {
   id: string;
   name: string;
-  department: string;
-  city: string;
-  state: string;
-  designation: string;
   address: string;
-  jurisdiction: string;
-  onlinePortal: string;
+  type: string;
+  mapsUrl: string;
+}
+
+interface PincodeResult {
+  pincode: string;
+  area: string;
+  district: string;
+  state: string;
+  problem: string;
+  department: string;
+  authorityLevel: string;
+  serviceCategories: string[];
+  complaintGuidance: string;
+  policeStations: LocalPlace[];
+  serviceProviders: LocalPlace[];
+}
+
+interface OSMPlace {
+  osm_id: number;
+  osm_type: string;
+  name?: string;
+  display_name: string;
+  type?: string;
+  lat?: string;
+  lon?: string;
 }
 
 export default function AuthorityFinderPage() {
-  const [selectedCity, setSelectedCity] = useState<string>('mumbai');
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
+  const [state, setState] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [problem, setProblem] = useState('');
+  const [pincodeResult, setPincodeResult] = useState<PincodeResult | null>(null);
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeError, setPincodeError] = useState('');
 
-  const authorities: Authority[] = [
-    {
-      id: 'a1',
-      name: 'Public Information Officer — Roads & Traffic',
-      department: 'RTI / PWD & Municipal Roads',
-      city: 'mumbai',
-      state: 'Maharashtra',
-      designation: 'Executive Engineer (Roads)',
-      address: 'BMC Headquarters, CST Station, Fort, Mumbai, Maharashtra 400001',
-      jurisdiction: 'All municipal road tenders, pothole repair work orders, and asphalt quality reports.',
-      onlinePortal: 'https://rtionline.gov.in'
-    },
-    {
-      id: 'a2',
-      name: 'Competent Authority & Rent Controller',
-      department: 'Tenancy & Rent Control',
-      city: 'mumbai',
-      state: 'Maharashtra',
-      designation: 'Rent Controller / Collectorate',
-      address: 'Old Custom House, Fort, Mumbai, Maharashtra 400001',
-      jurisdiction: 'Maharashtra Rent Control Act Section 24 deposit disputes and eviction summary suits.',
-      onlinePortal: 'https://maharashtra.gov.in'
-    },
-    {
-      id: 'a3',
-      name: 'Public Information Officer — Water Supply & Sewerage',
-      department: 'Water & Sanitation',
-      city: 'bengaluru',
-      state: 'Karnataka',
-      designation: 'Assistant Executive Engineer (BWSSB)',
-      address: 'BWSSB Complex, Cauvery Bhavan, KG Road, Bengaluru 560009',
-      jurisdiction: 'Water pipeline maintenance, sewage contamination complaints, and BWSSB tenders.',
-      onlinePortal: 'https://bwssb.karnataka.gov.in'
-    },
-    {
-      id: 'a4',
-      name: 'Public Information Officer — MCD Building & Works',
-      department: 'RTI / PWD & Municipal Roads',
-      city: 'delhi',
-      state: 'Delhi NCR',
-      designation: 'Superintending Engineer (MCD)',
-      address: 'Civic Centre, Minto Road, New Delhi 110002',
-      jurisdiction: 'Road paving tenders, building plan sanctions, and ward maintenance records.',
-      onlinePortal: 'https://rtionline.delhi.gov.in'
+  const findByPincode = async () => {
+    const normalizedPincode = pincode.trim();
+    if (!state.trim()) {
+      setPincodeError('Enter your state or union territory.');
+      return;
     }
-  ];
+    if (!problem.trim()) {
+      setPincodeError('Describe the problem so we can suggest the right department.');
+      return;
+    }
+    if (!/^\d{6}$/.test(normalizedPincode)) {
+      setPincodeError('Enter a valid 6-digit Indian PIN code.');
+      setPincodeResult(null);
+      return;
+    }
 
-  const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
+    setPincodeLoading(true);
+    setPincodeError('');
+    try {
+      const fetchWithTimeout = async (url: string, options?: RequestInit) => {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 12000);
+        try {
+          return await fetch(url, { ...options, signal: controller.signal });
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      };
+      const response = await fetchWithTimeout(`https://api.postalpincode.in/pincode/${normalizedPincode}`);
+      if (!response.ok) throw new Error('PIN lookup failed');
+      const postalData = await response.json();
+      const offices = postalData?.[0]?.PostOffice;
+      if (!Array.isArray(offices) || offices.length === 0) {
+        throw new Error('No area was found for that PIN code.');
+      }
 
-  const handleReport = (id: string) => {
-    setReportedIds(prev => {
-      const newSet = new Set(prev);
-      newSet.add(id);
-      return newSet;
-    });
-    // In a full production app, this would POST to a /api/report-pio endpoint
-    alert('Thank you for reporting! This PIO entry has been flagged. Our team will verify and update the contact details shortly.');
+      const firstOffice = offices[0];
+      const area = firstOffice.Block || firstOffice.District || firstOffice.Name;
+      const district = firstOffice.District;
+      const verifiedState = firstOffice.State;
+      if (!verifiedState.toLowerCase().includes(state.trim().toLowerCase()) && !state.trim().toLowerCase().includes(verifiedState.toLowerCase())) {
+        throw new Error(`This PIN code belongs to ${verifiedState}, not ${state.trim()}.`);
+      }
+      const recommendation = await apiFetch<{
+        department: string;
+        authority_level: string;
+        service_categories: string[];
+        complaint_guidance: string;
+      }>('/platform/authority-recommendation', {
+        method: 'POST',
+        body: { state: verifiedState, pincode: normalizedPincode, problem: problem.trim() },
+      });
+      const searchTerms = recommendation.service_categories.join(' OR ');
+      const searchArea = encodeURIComponent(`${searchTerms}, ${area}, ${district}, ${verifiedState}, India`);
+      const geocodeResponse = await fetchWithTimeout(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=25&addressdetails=1&q=${searchArea}`
+      );
+      const geocodedPlaces: OSMPlace[] = geocodeResponse.ok ? await geocodeResponse.json() : [];
+      const location = geocodedPlaces.find((place) => place.lat && place.lon);
+      let places: OSMPlace[] = [];
+      if (location) {
+        const serviceRegex = recommendation.service_categories
+          .map((category) => category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+          .join('|');
+        const overpassQuery = `[out:json];(nwr(around:10000,${location.lat},${location.lon})[name~"${serviceRegex}",i];nwr(around:10000,${location.lat},${location.lon})[amenity~"police|hospital|clinic|fire_station|school|post_office",i];nwr(around:10000,${location.lat},${location.lon})[office~"government|municipal|electricity",i];);out center tags;`;
+        const nearbyResponse = await fetchWithTimeout('https://overpass-api.de/api/interpreter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: overpassQuery,
+        });
+        const nearbyData = nearbyResponse.ok ? await nearbyResponse.json() : { elements: [] };
+        places = (nearbyData.elements || []).map((place: { id: number; type: string; tags?: { name?: string; [key: string]: string | undefined }; lat?: number; lon?: number; center?: { lat: number; lon: number } }) => ({
+          osm_id: place.id,
+          osm_type: place.type,
+          name: place.tags?.name,
+          display_name: [place.tags?.name, place.tags?.['addr:street'], place.tags?.['addr:city']].filter(Boolean).join(', ') || 'Mapped local service',
+          type: place.tags?.amenity || place.tags?.office,
+          lat: String(place.lat || place.center?.lat || ''),
+          lon: String(place.lon || place.center?.lon || ''),
+        }));
+      }
+      const toPlace = (place: OSMPlace, type: string): LocalPlace => ({
+        id: String(place.osm_id),
+        name: place.name || place.display_name.split(',')[0],
+        address: place.display_name,
+        type,
+        mapsUrl: `https://www.openstreetmap.org/${place.osm_type}/${place.osm_id}`,
+      });
+      const policeStations = places
+        .filter((place) => place.type === 'police' || /police station/i.test(place.display_name))
+        .slice(0, 6)
+        .map((place) => toPlace(place, 'Police station'));
+      const serviceProviders = places
+        .filter((place) => recommendation.service_categories.some((category) => place.display_name.toLowerCase().includes(category.toLowerCase())) || /hospital|clinic|fire_station|post_office|school|municipal|government|electricity/i.test(place.display_name))
+        .slice(0, 8)
+        .map((place) => toPlace(place, 'Local service'));
+
+      setPincodeResult({
+        pincode: normalizedPincode,
+        area,
+        district,
+        state: verifiedState,
+        problem: problem.trim(),
+        department: recommendation.department,
+        authorityLevel: recommendation.authority_level,
+        serviceCategories: recommendation.service_categories,
+        complaintGuidance: recommendation.complaint_guidance,
+        policeStations,
+        serviceProviders,
+      });
+    } catch (error) {
+      setPincodeResult(null);
+      setPincodeError(error instanceof Error ? error.message : 'Unable to find this PIN code.');
+    } finally {
+      setPincodeLoading(false);
+    }
   };
-
-  const filtered = authorities.filter((auth) => {
-    const matchesCity = selectedCity === 'all' || auth.city === selectedCity;
-    const matchesDept = selectedDepartment === 'all' || auth.department.includes(selectedDepartment);
-    return matchesCity && matchesDept;
-  });
 
   return (
     <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#151414] text-gray-900 dark:text-gray-100 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
@@ -101,100 +179,80 @@ export default function AuthorityFinderPage() {
           </p>
         </div>
 
-        {/* Filter Controls */}
-        <div className="bg-white dark:bg-[#201e1e] p-6 rounded-3xl border border-gray-200 dark:border-[#333] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Select City / Municipal Corporation
-            </label>
-            <select
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
-            >
-              <option value="all">All Cities & Regions</option>
-              <option value="mumbai">Mumbai (BMC / Rent Controller)</option>
-              <option value="bengaluru">Bengaluru (BBMP / BWSSB)</option>
-              <option value="delhi">Delhi NCR (MCD / DDA)</option>
-              <option value="pune">Pune (PMC)</option>
-              <option value="hyderabad">Hyderabad (GHMC)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Department Category
-            </label>
-            <select
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
-            >
-              <option value="all">All Departments</option>
-              <option value="RTI">Right to Information (PIO Officers)</option>
-              <option value="Tenancy">Rent Controller & Tenancy Authorities</option>
-              <option value="Water">Water Supply & Sewerage</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Directory Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filtered.map((auth) => (
-            <div
-              key={auth.id}
-              className="bg-white dark:bg-[#201e1e] p-6 rounded-3xl border border-gray-200 dark:border-[#333] shadow-sm flex flex-col justify-between space-y-4 hover:shadow-md transition-all"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-[#2d2a2a] text-blue-700 dark:text-[#e7b85b]">
-                    {auth.department}
-                  </span>
-                  <span className="text-xs font-semibold text-gray-400 capitalize">
-                    {auth.state}
-                  </span>
-                </div>
-
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{auth.name}</h3>
-                <p className="text-xs font-semibold text-[#0e6670] dark:text-[#e7b85b] mb-2">{auth.designation}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed mb-3">
-                  📍 {auth.address}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  <strong>Jurisdiction:</strong> {auth.jurisdiction}
-                </p>
-              </div>
-
-              <div className="pt-3 border-t border-gray-100 dark:border-[#2f2d2d] flex items-center justify-between gap-3 flex-wrap">
-                <div className="flex items-center gap-3">
-                  <a
-                    href={auth.onlinePortal}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-gray-500 hover:text-blue-600 dark:hover:text-[#e7b85b] font-medium"
-                  >
-                    Official Portal ↗
-                  </a>
-                  <button
-                    onClick={() => handleReport(auth.id)}
-                    disabled={reportedIds.has(auth.id)}
-                    className="text-[10px] flex items-center gap-1 text-rose-500 hover:text-rose-700 dark:text-rose-400 font-semibold disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
-                    title="PIOs transfer frequently. Flag this entry if details are outdated."
-                  >
-                    <span>🚩</span>
-                    <span>{reportedIds.has(auth.id) ? 'Reported' : 'Report incorrect info'}</span>
-                  </button>
-                </div>
-                <Link
-                  href="/application-generator"
-                  className="bg-[#0e6670] hover:bg-[#094d54] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm"
-                >
-                  Address Application Here →
-                </Link>
-              </div>
+        <section className="bg-[#eaf4f1] dark:bg-[#1b2928] p-6 rounded-3xl border border-[#b9d9d1] dark:border-[#31514d] shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="state" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">State / Union territory</label>
+              <input id="state" value={state} onChange={(event) => setState(event.target.value)} placeholder="e.g. Maharashtra" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-white dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]" />
             </div>
-          ))}
-        </div>
+            <div>
+              <label htmlFor="pincode" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">PIN code</label>
+              <input
+                id="pincode"
+                inputMode="numeric"
+                maxLength={6}
+                value={pincode}
+                onChange={(event) => setPincode(event.target.value.replace(/\D/g, ''))}
+                onKeyDown={(event) => event.key === 'Enter' && findByPincode()}
+                placeholder="6-digit PIN code"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-white dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
+              />
+            </div>
+            <div>
+              <label htmlFor="problem" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">What is your problem?</label>
+              <input id="problem" value={problem} onChange={(event) => setProblem(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && findByPincode()} placeholder="e.g. broken water pipeline" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-white dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]" />
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button type="button" onClick={findByPincode} disabled={pincodeLoading} className="bg-[#0e6670] hover:bg-[#094d54] disabled:opacity-60 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all">
+              {pincodeLoading ? 'Searching...' : 'Find the right department'}
+            </button>
+          </div>
+          {pincodeError && <p className="mt-3 text-xs font-semibold text-rose-600 dark:text-rose-400">{pincodeError}</p>}
+          {pincodeResult && (
+            <div className="mt-6 space-y-5">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-[#0e6670] dark:text-[#e7b85b]">{pincodeResult.pincode}</p>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{pincodeResult.area}</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{pincodeResult.district}, {pincodeResult.state}</p>
+                <p className="mt-2 text-xs text-gray-600 dark:text-gray-300"><strong>Problem:</strong> {pincodeResult.problem}</p>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <div className="bg-white dark:bg-[#201e1e] p-4 rounded-2xl border border-gray-200 dark:border-[#333]">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Recommended authority</h3>
+                  <p className="text-sm font-semibold text-[#0e6670] dark:text-[#e7b85b]">{pincodeResult.department}</p>
+                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-300">{pincodeResult.authorityLevel}</p>
+                  <p className="mt-3 text-xs text-gray-600 dark:text-gray-300">{pincodeResult.complaintGuidance}</p>
+                  <Link href={`/application-generator?issue=${encodeURIComponent(pincodeResult.problem)}`} className="inline-block mt-4 text-xs font-bold text-[#0e6670] dark:text-[#e7b85b] hover:underline">File a complaint ↗</Link>
+                </div>
+                <div className="bg-white dark:bg-[#201e1e] p-4 rounded-2xl border border-gray-200 dark:border-[#333]">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Police stations</h3>
+                  {pincodeResult.policeStations.length ? pincodeResult.policeStations.map((place) => (
+                    <a key={place.id} href={place.mapsUrl} target="_blank" rel="noreferrer" className="block py-2 border-b last:border-0 border-gray-100 dark:border-[#333] hover:text-[#0e6670] dark:hover:text-[#e7b85b]">
+                      <p className="text-sm font-semibold">{place.name}</p><p className="text-[11px] text-gray-500 dark:text-gray-400">{place.address}</p>
+                    </a>
+                  )) : <p className="text-xs text-gray-500 dark:text-gray-400">No mapped stations found nearby.</p>}
+                </div>
+                <div className="bg-white dark:bg-[#201e1e] p-4 rounded-2xl border border-gray-200 dark:border-[#333]">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Required local services</h3>
+                  <p className="mb-2 text-[11px] text-gray-500 dark:text-gray-400">{pincodeResult.serviceCategories.join(' • ')}</p>
+                  {pincodeResult.serviceProviders.length ? pincodeResult.serviceProviders.map((place) => (
+                    <a key={place.id} href={place.mapsUrl} target="_blank" rel="noreferrer" className="block py-2 border-b last:border-0 border-gray-100 dark:border-[#333] hover:text-[#0e6670] dark:hover:text-[#e7b85b]">
+                      <p className="text-sm font-semibold">{place.name}</p><p className="text-[11px] text-gray-500 dark:text-gray-400">{place.address}</p>
+                    </a>
+                  )) : <p className="text-xs text-gray-500 dark:text-gray-400">No mapped providers found nearby.</p>}
+                </div>
+                <div className="bg-white dark:bg-[#201e1e] p-4 rounded-2xl border border-gray-200 dark:border-[#333]">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">MLA / constituency</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">The PIN identifies {pincodeResult.district} district. Constituency boundaries and sitting MLAs can change, so verify the current representative through the official election directory.</p>
+                  <a href={`https://www.google.com/search?q=${encodeURIComponent(`current MLA ${pincodeResult.area} ${pincodeResult.district} ${pincodeResult.state}`)}`} target="_blank" rel="noreferrer" className="inline-block mt-3 text-xs font-bold text-[#0e6670] dark:text-[#e7b85b] hover:underline">Search current constituency details ↗</a>
+                </div>
+              </div>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">Area data: India Post. Nearby places: OpenStreetMap contributors. Verify contact details before visiting.</p>
+            </div>
+          )}
+        </section>
+
       </div>
     </div>
   );
