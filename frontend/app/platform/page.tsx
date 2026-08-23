@@ -832,7 +832,7 @@ export default function PlatformPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={() => handleSendMessage(undefined, 'Mere landlord ne security deposit wapas nahi kiya.')}
-                  className="p-3.5 bg-white dark:bg-[#232121] hover:bg-blue-50/50 dark:hover:bg-[#2d2a2a] border border-gray-200 dark:border-[#333] rounded-2xl text-left transition-all hover:border-blue-300 dark:hover:border-orange-500/50 flex items-start gap-3 shadow-sm group"
+                  className="p-3.5 bg-white dark:bg-[#232121] hover:bg-blue-50/50 dark:hover:bg-[#2d2a2a] border border-gray-200 dark:border-[#333] rounded-2xl text-left transition-all hover:border-blue-300 dark:hover:border-[#0e6670]/50 flex items-start gap-3 shadow-sm group"
                 >
                   <span className="text-xl p-1.5 bg-blue-50 dark:bg-[#2d2a2a] rounded-xl group-hover:scale-110 transition-transform">
                     🏠
@@ -849,7 +849,7 @@ export default function PlatformPage() {
 
                 <button
                   onClick={() => handleSendMessage(undefined, 'The municipal corporation has not repaired broken water pipeline and road in our area.')}
-                  className="p-3.5 bg-white dark:bg-[#232121] hover:bg-blue-50/50 dark:hover:bg-[#2d2a2a] border border-gray-200 dark:border-[#333] rounded-2xl text-left transition-all hover:border-blue-300 dark:hover:border-orange-500/50 flex items-start gap-3 shadow-sm group"
+                  className="p-3.5 bg-white dark:bg-[#232121] hover:bg-blue-50/50 dark:hover:bg-[#2d2a2a] border border-gray-200 dark:border-[#333] rounded-2xl text-left transition-all hover:border-blue-300 dark:hover:border-[#0e6670]/50 flex items-start gap-3 shadow-sm group"
                 >
                   <span className="text-xl p-1.5 bg-blue-50 dark:bg-[#2d2a2a] rounded-xl group-hover:scale-110 transition-transform">
                     🏛️
@@ -866,7 +866,7 @@ export default function PlatformPage() {
 
                 <button
                   onClick={() => handleSendMessage(undefined, 'How can I file an RTI application to inspect public road tender and work completion records?')}
-                  className="p-3.5 bg-white dark:bg-[#232121] hover:bg-blue-50/50 dark:hover:bg-[#2d2a2a] border border-gray-200 dark:border-[#333] rounded-2xl text-left transition-all hover:border-blue-300 dark:hover:border-orange-500/50 flex items-start gap-3 shadow-sm group"
+                  className="p-3.5 bg-white dark:bg-[#232121] hover:bg-blue-50/50 dark:hover:bg-[#2d2a2a] border border-gray-200 dark:border-[#333] rounded-2xl text-left transition-all hover:border-blue-300 dark:hover:border-[#0e6670]/50 flex items-start gap-3 shadow-sm group"
                 >
                   <span className="text-xl p-1.5 bg-blue-50 dark:bg-[#2d2a2a] rounded-xl group-hover:scale-110 transition-transform">
                     📜
@@ -883,7 +883,7 @@ export default function PlatformPage() {
 
                 <button
                   onClick={() => handleSendMessage(undefined, 'Landlord gave me sudden eviction notice without 30 days notice period.')}
-                  className="p-3.5 bg-white dark:bg-[#232121] hover:bg-blue-50/50 dark:hover:bg-[#2d2a2a] border border-gray-200 dark:border-[#333] rounded-2xl text-left transition-all hover:border-blue-300 dark:hover:border-orange-500/50 flex items-start gap-3 shadow-sm group"
+                  className="p-3.5 bg-white dark:bg-[#232121] hover:bg-blue-50/50 dark:hover:bg-[#2d2a2a] border border-gray-200 dark:border-[#333] rounded-2xl text-left transition-all hover:border-blue-300 dark:hover:border-[#0e6670]/50 flex items-start gap-3 shadow-sm group"
                 >
                   <span className="text-xl p-1.5 bg-blue-50 dark:bg-[#2d2a2a] rounded-xl group-hover:scale-110 transition-transform">
                     ⚖️

@@ -44,6 +44,18 @@ export default function Navbar() {
     { code: 'hinglish', name: 'Hinglish' },
   ];
 
+  const handleLanguageChange = (langCode: string, langName: string) => {
+    setSelectedLang(langName);
+    setIsLangOpen(false);
+
+    // Trigger Google Translate native dropdown
+    const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+    if (select) {
+      select.value = langCode;
+      select.dispatchEvent(new Event('change'));
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-50 bg-[#0f2b2a]/90 backdrop-blur-xl border-b border-white/10 text-white shadow-md transition-colors duration-200">
       <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -157,10 +169,7 @@ export default function Navbar() {
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
-                      onClick={() => {
-                        setSelectedLang(lang.name);
-                        setIsLangOpen(false);
-                      }}
+                      onClick={() => handleLanguageChange(lang.code, lang.name)}
                       className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                     >
                       {lang.name}

@@ -303,8 +303,6 @@ export default function ActionPlanPage() {
         </div>
       </div>
 
-      {/* Integrated Page Footer */}
-      <Footer />
     </div>
   );
 }
