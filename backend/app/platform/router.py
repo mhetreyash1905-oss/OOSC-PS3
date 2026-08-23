@@ -50,7 +50,7 @@ async def authority_recommendation(request: AuthorityRecommendationRequest, curr
     try:
         response = await asyncio.to_thread(
             client.models.generate_content,
-            model='gemini-2.5-flash',
+            model='gemini-1.5-flash',
             contents=[types.Content(role="user", parts=[types.Part.from_text(text=prompt)])],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -60,8 +60,9 @@ async def authority_recommendation(request: AuthorityRecommendationRequest, curr
         )
         return json.loads(response.text)
     except Exception as e:
-        print(f"Error in authority recommendation: {e}")
-        raise HTTPException(status_code=500, detail="Failed to find authority recommendation")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Failed to find authority recommendation: {str(e)}")
 
 @router.get("/sessions/history")
 async def get_session_history(current_user: dict = Depends(get_current_user)):
@@ -580,7 +581,7 @@ Document Text:
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-1.5-flash',
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

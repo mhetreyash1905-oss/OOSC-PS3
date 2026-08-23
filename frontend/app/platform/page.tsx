@@ -526,7 +526,7 @@ export default function PlatformPage() {
               <li>
                 <button
                   onClick={() => router.push('/cases')}
-                  className="w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-[#2c2a2a] hover:text-blue-700 dark:hover:text-orange-400 flex items-center gap-3 transition-colors group"
+                  className="w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-[#2c2a2a] hover:text-blue-700 dark:hover:text-[#e7b85b] flex items-center gap-3 transition-colors group"
                 >
                   <span className="text-base group-hover:scale-110 transition-transform">🗂️</span>
                   <span>My Cases</span>
@@ -535,7 +535,7 @@ export default function PlatformPage() {
               <li>
                 <button
                   onClick={() => router.push('/saved-documents')}
-                  className="w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-[#2c2a2a] hover:text-blue-700 dark:hover:text-orange-400 flex items-center gap-3 transition-colors group"
+                  className="w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-[#2c2a2a] hover:text-blue-700 dark:hover:text-[#e7b85b] flex items-center gap-3 transition-colors group"
                 >
                   <span className="text-base group-hover:scale-110 transition-transform">📁</span>
                   <span>Saved Documents</span>
@@ -544,7 +544,7 @@ export default function PlatformPage() {
               <li>
                 <button
                   onClick={() => router.push('/applications')}
-                  className="w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-[#2c2a2a] hover:text-blue-700 dark:hover:text-orange-400 flex items-center gap-3 transition-colors group"
+                  className="w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-[#2c2a2a] hover:text-blue-700 dark:hover:text-[#e7b85b] flex items-center gap-3 transition-colors group"
                 >
                   <span className="text-base group-hover:scale-110 transition-transform">📋</span>
                   <span>Applications</span>
