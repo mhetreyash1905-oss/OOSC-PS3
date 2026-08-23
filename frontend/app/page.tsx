@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import CursorParticleCanvas from '@/components/CursorParticleCanvas';
 
 export default function Home() {
   const [activeDemo, setActiveDemo] = useState<number>(0);
