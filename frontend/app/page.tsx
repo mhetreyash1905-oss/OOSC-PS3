@@ -118,7 +118,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 transition-colors duration-200 relative">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#0b2b31] via-[#0e6670] to-[#124b55] text-white py-24 px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0b2b31] via-[#0e6670] to-[#124b55] text-white py-24 px-4 sm:px-6 lg:px-8 rounded-b-[2.5rem] shadow-2xl shadow-[#14505b]/30 border-b border-white/10">
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:28px_28px]"></div>
         
         {/* Ambient Glow Orbs */}

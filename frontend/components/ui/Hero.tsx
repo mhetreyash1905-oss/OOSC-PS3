@@ -11,7 +11,7 @@ export interface HeroProps {
 
 export function Hero({ badgeText, title, description, children }: HeroProps) {
   return (
-    <section className="relative w-full overflow-hidden bg-[#14505b] text-white py-16 px-4 sm:px-6 lg:px-8 shadow-xl">
+    <section className="relative w-full overflow-hidden bg-[#14505b] text-white py-16 px-4 sm:px-6 lg:px-8 rounded-b-[2.5rem] shadow-2xl shadow-[#14505b]/30 border-b border-white/10">
       {/* Background Dotted Radial Grid */}
       <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
 
