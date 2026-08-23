@@ -163,30 +163,42 @@ export default function AuthorityFinderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#151414] text-gray-900 dark:text-gray-100 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="max-w-5xl mx-auto space-y-10">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-[#252323] text-blue-700 dark:text-[#e7b85b] text-xs font-bold border border-blue-100 dark:border-[#383535]">
-            <span>🏛️</span>
+    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      {/* Top Hero Banner */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0b2b31] via-[#0e6670] to-[#124b55] text-white py-16 px-4 sm:px-6 lg:px-8 shadow-xl">
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div className="relative max-w-5xl mx-auto text-center z-10 space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#e7b85b] text-xs font-extrabold shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
             <span>Government Officer & PIO Directory</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            Authority Finder
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+            Authority & Ward Officer Directory
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Locate the exact Public Information Officer (PIO), Rent Controller, or Municipal Ward Commissioner for your city.
+          <p className="text-sm sm:text-base text-[#d4eae6] max-w-2xl mx-auto font-medium">
+            Locate the exact Public Information Officer (PIO), Rent Controller, or Municipal Ward Commissioner for your pin code and problem type.
           </p>
         </div>
+      </section>
 
-        <section className="bg-[#eaf4f1] dark:bg-[#1b2928] p-6 rounded-3xl border border-[#b9d9d1] dark:border-[#31514d] shadow-sm">
+      {/* Main Search Area */}
+      <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
+        <section className="bg-white dark:bg-[#1d1b1b] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-md space-y-6">
+          <div className="flex items-center gap-3 border-b border-gray-100 dark:border-[#2d2a2a] pb-4">
+            <span className="text-3xl">🏛️</span>
+            <div>
+              <h2 className="text-xl font-black text-gray-900 dark:text-white">Pin Code & Problem Search</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Enter location details to retrieve jurisdiction authorities & PIO offices.</p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="state" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">State / Union territory</label>
-              <input id="state" value={state} onChange={(event) => setState(event.target.value)} placeholder="e.g. Maharashtra" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-white dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]" />
+              <label htmlFor="state" className="block text-xs font-extrabold text-gray-700 dark:text-gray-300 mb-2">State / Union Territory</label>
+              <input id="state" value={state} onChange={(event) => setState(event.target.value)} placeholder="e.g. Maharashtra" className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#252323] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670] font-medium" />
             </div>
             <div>
-              <label htmlFor="pincode" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">PIN code</label>
+              <label htmlFor="pincode" className="block text-xs font-extrabold text-gray-700 dark:text-gray-300 mb-2">6-Digit PIN Code</label>
               <input
                 id="pincode"
                 inputMode="numeric"
@@ -194,65 +206,86 @@ export default function AuthorityFinderPage() {
                 value={pincode}
                 onChange={(event) => setPincode(event.target.value.replace(/\D/g, ''))}
                 onKeyDown={(event) => event.key === 'Enter' && findByPincode()}
-                placeholder="6-digit PIN code"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-white dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]"
+                placeholder="e.g. 400001"
+                className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#252323] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670] font-medium"
               />
             </div>
             <div>
-              <label htmlFor="problem" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">What is your problem?</label>
-              <input id="problem" value={problem} onChange={(event) => setProblem(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && findByPincode()} placeholder="e.g. broken water pipeline" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#333] bg-white dark:bg-[#282626] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670]" />
+              <label htmlFor="problem" className="block text-xs font-extrabold text-gray-700 dark:text-gray-300 mb-2">Problem Description</label>
+              <input id="problem" value={problem} onChange={(event) => setProblem(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && findByPincode()} placeholder="e.g. broken road, water contamination" className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#252323] text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#0e6670] font-medium" />
             </div>
           </div>
-          <div className="mt-4 flex justify-end">
-            <button type="button" onClick={findByPincode} disabled={pincodeLoading} className="bg-[#0e6670] hover:bg-[#094d54] disabled:opacity-60 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all">
-              {pincodeLoading ? 'Searching...' : 'Find the right department'}
+
+          <div className="flex justify-end">
+            <button type="button" onClick={findByPincode} disabled={pincodeLoading} className="bg-gradient-to-r from-[#0e6670] to-[#124b55] hover:from-[#094d54] hover:to-[#0e3b43] text-white text-sm font-extrabold px-7 py-3.5 rounded-2xl shadow-lg transition-all disabled:opacity-60 flex items-center gap-2">
+              {pincodeLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Searching Jurisdiction...</span>
+                </>
+              ) : (
+                <>
+                  <span>🔍</span>
+                  <span>Find Designated Department</span>
+                </>
+              )}
             </button>
           </div>
-          {pincodeError && <p className="mt-3 text-xs font-semibold text-rose-600 dark:text-rose-400">{pincodeError}</p>}
+
+          {pincodeError && <p className="text-xs font-semibold text-rose-600 dark:text-rose-400">{pincodeError}</p>}
+
           {pincodeResult && (
-            <div className="mt-6 space-y-5">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-[#0e6670] dark:text-[#e7b85b]">{pincodeResult.pincode}</p>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{pincodeResult.area}</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{pincodeResult.district}, {pincodeResult.state}</p>
-                <p className="mt-2 text-xs text-gray-600 dark:text-gray-300"><strong>Problem:</strong> {pincodeResult.problem}</p>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-[#201e1e] p-4 rounded-2xl border border-gray-200 dark:border-[#333]">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Recommended authority</h3>
-                  <p className="text-sm font-semibold text-[#0e6670] dark:text-[#e7b85b]">{pincodeResult.department}</p>
-                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-300">{pincodeResult.authorityLevel}</p>
-                  <p className="mt-3 text-xs text-gray-600 dark:text-gray-300">{pincodeResult.complaintGuidance}</p>
-                  <Link href={`/application-generator?issue=${encodeURIComponent(pincodeResult.problem)}`} className="inline-block mt-4 text-xs font-bold text-[#0e6670] dark:text-[#e7b85b] hover:underline">File a complaint ↗</Link>
+            <div className="mt-8 space-y-6 pt-6 border-t border-gray-100 dark:border-[#2d2a2a]">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-xs font-extrabold uppercase tracking-wide text-[#0e6670] dark:text-[#e7b85b]">PIN Code: {pincodeResult.pincode}</p>
+                  <h2 className="text-2xl font-black text-gray-900 dark:text-white">{pincodeResult.area}</h2>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 font-medium">{pincodeResult.district}, {pincodeResult.state}</p>
                 </div>
-                <div className="bg-white dark:bg-[#201e1e] p-4 rounded-2xl border border-gray-200 dark:border-[#333]">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Police stations</h3>
+                <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-blue-50 dark:bg-[#2d2a2a] text-blue-700 dark:text-[#e7b85b]">
+                  Problem: {pincodeResult.problem}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-gray-50 dark:bg-[#252323] p-6 rounded-2xl border border-gray-200/80 dark:border-[#383535] space-y-3">
+                  <h3 className="font-extrabold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                    <span>🏛️</span> Designated Authority
+                  </h3>
+                  <p className="text-sm font-extrabold text-[#0e6670] dark:text-[#e7b85b]">{pincodeResult.department}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 font-medium">{pincodeResult.authorityLevel}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed font-medium">{pincodeResult.complaintGuidance}</p>
+                  <Link href={`/application-generator?issue=${encodeURIComponent(pincodeResult.problem)}`} className="inline-flex items-center gap-1 mt-2 text-xs font-extrabold text-[#0e6670] dark:text-[#e7b85b] hover:underline">Draft Complaint Notice ↗</Link>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-[#252323] p-6 rounded-2xl border border-gray-200/80 dark:border-[#383535] space-y-3">
+                  <h3 className="font-extrabold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                    <span>🚔</span> Police Stations
+                  </h3>
                   {pincodeResult.policeStations.length ? pincodeResult.policeStations.map((place) => (
-                    <a key={place.id} href={place.mapsUrl} target="_blank" rel="noreferrer" className="block py-2 border-b last:border-0 border-gray-100 dark:border-[#333] hover:text-[#0e6670] dark:hover:text-[#e7b85b]">
-                      <p className="text-sm font-semibold">{place.name}</p><p className="text-[11px] text-gray-500 dark:text-gray-400">{place.address}</p>
+                    <a key={place.id} href={place.mapsUrl} target="_blank" rel="noreferrer" className="block py-2 border-b last:border-0 border-gray-200/60 dark:border-[#333] hover:text-[#0e6670] dark:hover:text-[#e7b85b]">
+                      <p className="text-xs font-extrabold">{place.name}</p>
+                      <p className="text-[11px] text-gray-500 font-medium">{place.address}</p>
                     </a>
-                  )) : <p className="text-xs text-gray-500 dark:text-gray-400">No mapped stations found nearby.</p>}
+                  )) : <p className="text-xs text-gray-500">No mapped stations found nearby.</p>}
                 </div>
-                <div className="bg-white dark:bg-[#201e1e] p-4 rounded-2xl border border-gray-200 dark:border-[#333]">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Required local services</h3>
-                  <p className="mb-2 text-[11px] text-gray-500 dark:text-gray-400">{pincodeResult.serviceCategories.join(' • ')}</p>
+
+                <div className="bg-gray-50 dark:bg-[#252323] p-6 rounded-2xl border border-gray-200/80 dark:border-[#383535] space-y-3">
+                  <h3 className="font-extrabold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                    <span>📍</span> Local Service Offices
+                  </h3>
+                  <p className="text-[11px] font-semibold text-gray-500">{pincodeResult.serviceCategories.join(' • ')}</p>
                   {pincodeResult.serviceProviders.length ? pincodeResult.serviceProviders.map((place) => (
-                    <a key={place.id} href={place.mapsUrl} target="_blank" rel="noreferrer" className="block py-2 border-b last:border-0 border-gray-100 dark:border-[#333] hover:text-[#0e6670] dark:hover:text-[#e7b85b]">
-                      <p className="text-sm font-semibold">{place.name}</p><p className="text-[11px] text-gray-500 dark:text-gray-400">{place.address}</p>
+                    <a key={place.id} href={place.mapsUrl} target="_blank" rel="noreferrer" className="block py-2 border-b last:border-0 border-gray-200/60 dark:border-[#333] hover:text-[#0e6670] dark:hover:text-[#e7b85b]">
+                      <p className="text-xs font-extrabold">{place.name}</p>
+                      <p className="text-[11px] text-gray-500 font-medium">{place.address}</p>
                     </a>
-                  )) : <p className="text-xs text-gray-500 dark:text-gray-400">No mapped providers found nearby.</p>}
-                </div>
-                <div className="bg-white dark:bg-[#201e1e] p-4 rounded-2xl border border-gray-200 dark:border-[#333]">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">MLA / constituency</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">The PIN identifies {pincodeResult.district} district. Constituency boundaries and sitting MLAs can change, so verify the current representative through the official election directory.</p>
-                  <a href={`https://www.google.com/search?q=${encodeURIComponent(`current MLA ${pincodeResult.area} ${pincodeResult.district} ${pincodeResult.state}`)}`} target="_blank" rel="noreferrer" className="inline-block mt-3 text-xs font-bold text-[#0e6670] dark:text-[#e7b85b] hover:underline">Search current constituency details ↗</a>
+                  )) : <p className="text-xs text-gray-500">No mapped providers found nearby.</p>}
                 </div>
               </div>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400">Area data: India Post. Nearby places: OpenStreetMap contributors. Verify contact details before visiting.</p>
             </div>
           )}
         </section>
-
       </div>
     </div>
   );
