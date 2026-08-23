@@ -48,18 +48,42 @@ police station and women help desk; garbage -> Municipal Corporation, ward offic
 and sanitation office.
 """
     user_message = f"State: {request.state}\nPIN code: {request.pincode}\nProblem: {request.problem}"
-    response = await asyncio.to_thread(
-        client.models.generate_content,
-        model="gemini-3.6-flash",
-        contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_message)])],
-        config=types.GenerateContentConfig(
-            system_instruction=prompt,
-            response_mime_type="application/json",
-            response_schema=AuthorityRecommendationResponse,
-            temperature=0.1,
-        ),
-    )
-    return json.loads(response.text)
+    try:
+        response = await asyncio.wait_for(asyncio.to_thread(
+            client.models.generate_content,
+            model="gemini-3.6-flash",
+            contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_message)])],
+            config=types.GenerateContentConfig(
+                system_instruction=prompt,
+                response_mime_type="application/json",
+                response_schema=AuthorityRecommendationResponse,
+                temperature=0.1,
+            ),
+        ), timeout=15)
+        return json.loads(response.text)
+    except Exception:
+        problem = request.problem.lower()
+        if any(word in problem for word in ["electric", "power", "voltage", "light"]):
+            department = "Electricity Distribution Company"
+            services = ["electricity complaint office", "electricity service centre", "power substation"]
+        elif any(word in problem for word in ["police", "crime", "theft", "violence", "harassment", "noise", "safety"]):
+            department = "Police Department"
+            services = ["police station", "district police office", "women help desk"]
+        elif any(word in problem for word in ["water", "drain", "garbage", "road", "streetlight", "sewage"]):
+            department = "Municipal Corporation / Local Body"
+            services = ["ward office", "municipal complaint centre", "public works office"]
+        elif any(word in problem for word in ["ration", "pension", "subsidy", "housing", "certificate", "welfare"]):
+            department = "District Administration / Collectorate"
+            services = ["citizen service centre", "tehsil office", "district welfare office"]
+        else:
+            department = "District Administration / Public Grievance Cell"
+            services = ["district grievance office", "citizen service centre", "concerned department office"]
+        return {
+            "department": department,
+            "authority_level": f"Local authority for {request.state}",
+            "service_categories": services,
+            "complaint_guidance": "Open the complaint form for this issue and attach your address, PIN code, and supporting evidence.",
+        }
 
 @router.get("/sessions/history")
 async def get_session_history(current_user: dict = Depends(get_current_user)):
