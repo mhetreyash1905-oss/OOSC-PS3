@@ -21,18 +21,19 @@ async def get_session_history(current_user: dict = Depends(get_current_user)):
     """Return the user's past sessions for the sidebar history list."""
     cursor = sessions_collection.find(
         {"user_id": current_user["user_id"]},
-        {"intake_history": 1, "status": 1, "created_at": 1, "intake": 1}
+        {"intake_history": 1, "status": 1, "created_at": 1, "intake": 1, "custom_title": 1}
     ).sort("created_at", -1).limit(30)
     
     sessions = []
     async for session in cursor:
-        # Build a short title from the first user message or intake category
-        title = "New Chat"
-        history = session.get("intake_history", [])
-        for msg in history:
-            if msg.get("role") == "user":
-                title = msg["content"][:60]
-                break
+        title = session.get("custom_title")
+        if not title:
+            title = "New Chat"
+            history = session.get("intake_history", [])
+            for msg in history:
+                if msg.get("role") == "user":
+                    title = msg["content"][:60]
+                    break
         
         intake = session.get("intake")
         if intake and intake.get("category"):
@@ -40,7 +41,7 @@ async def get_session_history(current_user: dict = Depends(get_current_user)):
         else:
             category = None
 
-        if title != "New Chat":
+        if title != "New Chat" or session.get("custom_title"):
             sessions.append({
                 "session_id": str(session["_id"]),
                 "title": title,
@@ -50,6 +51,37 @@ async def get_session_history(current_user: dict = Depends(get_current_user)):
             })
     
     return {"sessions": sessions}
+
+
+@router.delete("/sessions/{session_id}")
+async def delete_session(session_id: str, current_user: dict = Depends(get_current_user)):
+    try:
+        obj_id = ObjectId(session_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid session_id format")
+    
+    result = await sessions_collection.delete_one({"_id": obj_id, "user_id": current_user["user_id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return {"status": "deleted"}
+
+class RenameSessionRequest(BaseModel):
+    title: str
+
+@router.put("/sessions/{session_id}/title")
+async def rename_session(session_id: str, req: RenameSessionRequest, current_user: dict = Depends(get_current_user)):
+    try:
+        obj_id = ObjectId(session_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid session_id format")
+    
+    result = await sessions_collection.update_one(
+        {"_id": obj_id, "user_id": current_user["user_id"]},
+        {"$set": {"custom_title": req.title}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return {"status": "renamed", "title": req.title}
 
 @router.get("/sessions/{session_id_str}")
 async def get_session(session_id_str: str, current_user: dict = Depends(get_current_user)):
