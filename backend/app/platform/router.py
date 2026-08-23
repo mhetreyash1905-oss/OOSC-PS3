@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from datetime import datetime
+import asyncio
 import json
 from bson import ObjectId
 from app.auth.dependencies import get_current_user
@@ -28,13 +29,13 @@ class AuthorityRecommendationResponse(BaseModel):
     service_categories: list[str]
     complaint_guidance: str
 
-@router.post("/authority-recommendation", response_model=AuthorityRecommendationResponse)
+@router.post("/authority-recommendation")
 async def authority_recommendation(request: AuthorityRecommendationRequest):
-    """Use Gemini to identify only the services relevant to a citizen's problem."""
     from google import genai
     from google.genai import types
     from app.config import GEMINI_API_KEY
-    import asyncio
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key missing")
 
     client = genai.Client(api_key=GEMINI_API_KEY)
     prompt = """You identify the correct Indian public department for a citizen complaint.
@@ -508,201 +509,6 @@ class DocumentUploadRequest(BaseModel):
 
 @router.post("/upload-document")
 async def upload_document(req: DocumentUploadRequest, current_user: dict = Depends(get_current_user)):
-    if session["status"] != "rights" or not session.get("rights_explanation", {}).get("clarification_question"):
-        raise HTTPException(status_code=400, detail="No active clarification question")
-
-    # Append the answer to intake facts
-    new_facts = session["intake"].get("facts", "") + f"\n\n[Clarification] Q: {session['rights_explanation']['clarification_question']}\nA: {request.answer}"
-    session["intake"]["facts"] = new_facts
-    
-    from app.agents.rights_navigator import generate_rights_explanation
-    explanation_data = await generate_rights_explanation(session["intake"])
-    
-    status_update = "recommendation" if not explanation_data.get("clarification_question") else "rights"
-
-    await sessions_collection.update_one(
-        {"_id": session_id},
-        {"$set": {
-            "intake": session["intake"],
-            "rights_explanation": explanation_data,
-            "status": status_update
-        }}
-    )
-    return explanation_data
-
-@router.post("/recommend")
-async def recommend(request: SessionRequest, current_user: dict = Depends(get_current_user)):
-    try:
-        session_id = ObjectId(request.session_id)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid session_id format")
-
-    session = await sessions_collection.find_one({"_id": session_id, "user_id": current_user["user_id"]})
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    if session["status"] not in ["recommendation", "drafting", "complete"]:
-        raise HTTPException(status_code=400, detail="Session is not ready for recommendation")
-
-    if not session.get("recommendation"):
-        from app.agents.action_recommender import generate_recommendation
-        recommendation_data = await generate_recommendation(session["intake"], session["rights_explanation"])
-        
-        await sessions_collection.update_one(
-            {"_id": session_id},
-            {"$set": {
-                "recommendation": recommendation_data,
-                "status": "drafting"
-            }}
-        )
-        return recommendation_data
-    
-    return session["recommendation"]
-
-@router.post("/draft-rti")
-async def draft_rti(request: SessionRequest, current_user: dict = Depends(get_current_user)):
-    try:
-        session_id = ObjectId(request.session_id)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid session_id format")
-
-    session = await sessions_collection.find_one({"_id": session_id, "user_id": current_user["user_id"]})
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    if session["status"] not in ["drafting", "complete"]:
-        raise HTTPException(status_code=400, detail="Session is not ready for RTI drafting")
-
-    if not session.get("rti_document"):
-        from app.agents.rti_drafter import draft_rti_application
-        rti_data = await draft_rti_application(session["intake"], session.get("recommendation", {}), current_user.get("email", "Citizen"))
-        
-        await sessions_collection.update_one(
-            {"_id": session_id},
-            {"$set": {
-                "rti_document": rti_data,
-                "status": "complete"
-            }}
-        )
-        return rti_data
-    
-    return session["rti_document"]
-
-@router.get("/download-summary/{session_id_str}")
-async def download_summary(session_id_str: str, current_user: dict = Depends(get_current_user)):
-    try:
-        session_id = ObjectId(session_id_str)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid session_id format")
-
-    session = await sessions_collection.find_one({"_id": session_id, "user_id": current_user["user_id"]})
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    from app.pdf.generator import generate_case_summary_pdf
-    pdf_bytes = generate_case_summary_pdf(session)
-
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=Case_Summary_{session_id_str}.pdf"
-        }
-    )
-
-@router.get("/download-rti/{session_id_str}")
-async def download_rti(session_id_str: str, current_user: dict = Depends(get_current_user)):
-    try:
-        session_id = ObjectId(session_id_str)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid session_id format")
-
-    session = await sessions_collection.find_one({"_id": session_id, "user_id": current_user["user_id"]})
-    if not session or not session.get("rti_document"):
-        raise HTTPException(status_code=404, detail="RTI Document not found")
-
-    from app.pdf.generator import generate_rti_pdf
-    pdf_bytes = generate_rti_pdf(session["rti_document"])
-    
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f'attachment; filename="RTI_Application_{session_id_str}.pdf"'
-        }
-    )
-
-@router.get("/documents")
-async def get_saved_documents(current_user: dict = Depends(get_current_user)):
-    """Retrieve all generated documents and drafts for the current user."""
-    cursor = sessions_collection.find(
-        {"user_id": current_user["user_id"], "rti_document": {"$ne": None}},
-        {"_id": 1, "created_at": 1, "rti_document": 1, "intake": 1, "status": 1}
-    ).sort("created_at", -1)
-    
-    docs = []
-    async for session in cursor:
-        rti = session.get("rti_document", {})
-        intake = session.get("intake", {}) or {}
-        docs.append({
-            "id": str(session["_id"]),
-            "session_id": str(session["_id"]),
-            "title": rti.get("subject") or f"RTI Application - {intake.get('category', 'Civic Issue')}",
-            "type": "RTI Application (PDF)",
-            "category": intake.get("category", "General Civic"),
-            "department": rti.get("pio_department") or rti.get("pio_designation") or "Public Information Authority",
-            "created_at": session.get("created_at", "").isoformat() if session.get("created_at") else None,
-            "download_url": f"/platform/download-rti/{str(session['_id'])}"
-        })
-    return {"documents": docs}
-
-@router.get("/applications")
-async def get_applications(current_user: dict = Depends(get_current_user)):
-    """Retrieve all civic applications, RTIs, and complaints initiated by user."""
-    cursor = sessions_collection.find(
-        {"user_id": current_user["user_id"]},
-        {"_id": 1, "created_at": 1, "status": 1, "intake": 1, "recommendation": 1, "rti_document": 1}
-    ).sort("created_at", -1)
-    
-    apps = []
-    async for session in cursor:
-        intake = session.get("intake") or {}
-        rec = session.get("recommendation") or {}
-        has_doc = session.get("rti_document") is not None
-        
-        status_label = "Drafting"
-        if has_doc or session.get("status") == "complete":
-            status_label = "Ready to File"
-        elif session.get("status") == "recommendation":
-            status_label = "Strategy Formed"
-        elif session.get("status") == "rights":
-            status_label = "Rights Analyzed"
-        elif session.get("status") == "intake":
-            status_label = "In Assessment"
-
-        title = intake.get("facts", "")[:80] if intake.get("facts") else "Civic Rights Query"
-        category = intake.get("category", "tenancy_dispute").replace("_", " ").title()
-        
-        apps.append({
-            "id": str(session["_id"]),
-            "session_id": str(session["_id"]),
-            "title": title,
-            "category": category,
-            "issue_detected": intake.get("issue_detected") or category,
-            "status": status_label,
-            "action_type": rec.get("action_type") or "file_rti",
-            "created_at": session.get("created_at", "").isoformat() if session.get("created_at") else None,
-            "has_download": has_doc
-        })
-    return {"applications": apps}
-
-class DocumentUploadRequest(BaseModel):
-    filename: str
-    content: str
-    file_type: str = "text"
-
-@router.post("/upload-document")
-async def upload_document(req: DocumentUploadRequest, current_user: dict = Depends(get_current_user)):
     """Accept and summarize text from uploaded documents (agreements, notices, bills)."""
     return {
         "filename": req.filename,
@@ -740,7 +546,7 @@ async def generate_document(request: GenerateDocRequest, current_user: dict = De
     
     response = await asyncio.to_thread(
         client.models.generate_content,
-        model='gemini-3.6-flash',
+        model='gemini-2.5-flash',
         contents=[types.Content(role="user", parts=[types.Part.from_text(text=prompt)])],
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
@@ -797,7 +603,7 @@ Document Text:
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-1.5-flash',
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

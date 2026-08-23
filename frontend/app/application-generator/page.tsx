@@ -15,7 +15,7 @@ function ApplicationGeneratorContent() {
   const [isDraftingAI, setIsDraftingAI] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [docType, setDocType] = useState<'rti' | 'landlord_notice' | 'municipal'>('rti');
+  const [docType, setDocType] = useState<'rti' | 'landlord_notice' | 'municipal' | 'consumer' | 'utility' | 'eviction'>('rti');
   
   // Form State
   const [applicantName, setApplicantName] = useState('Ramesh Kumar');
@@ -26,7 +26,7 @@ function ApplicationGeneratorContent() {
 
   const [generating, setGenerating] = useState(false);
 
-  const handleApplyPreset = (type: 'rti' | 'landlord_notice' | 'municipal') => {
+  const handleApplyPreset = (type: 'rti' | 'landlord_notice' | 'municipal' | 'consumer' | 'utility' | 'eviction') => {
     setDocType(type);
     if (type === 'rti') {
       setAuthority('Public Information Officer, Brihanmumbai Municipal Corporation (BMC)');
@@ -40,6 +40,18 @@ function ApplicationGeneratorContent() {
       setAuthority('To: Executive Engineer / Ward Officer, Ward H-West, Municipal Corporation');
       setSubject('Formal Complaint & Notice regarding Contaminated Water Supply & Sewage Line Leakage');
       setParticulars('We write to bring to your urgent attention severe sewage contamination in municipal drinking water pipeline causing public health hazards. Immediate site inspection and pipe repair required within 7 days.');
+    } else if (type === 'consumer') {
+      setAuthority('To: Nodal Grievance Officer, Flipkart Internet Private Limited / Seller');
+      setSubject('Statutory Demand Notice for Refund & Compensation under Consumer Protection Act 2019');
+      setParticulars('Defective laptop delivered under Order ID #OD3094829104. Refund wrongfully refused. You are called upon to refund ₹15,000 plus ₹5,000 compensation for mental harassment within 15 days.');
+    } else if (type === 'utility') {
+      setAuthority('To: Executive Engineer (Testing), State Electricity Distribution Co. Ltd.');
+      setSubject('Application for High-Accuracy Meter Testing & Disputed Consumption Billing Revision');
+      setParticulars('Re: Consumer Account #90382910. Current bill shows 4x average consumption due to faulty electronic meter. Requesting official lab testing under Section 56 of Electricity Act 2003.');
+    } else if (type === 'eviction') {
+      setAuthority('To: Landlord / Property Owner, House #45, Civil Lines');
+      setSubject('Legal Reply to Unlawful Eviction Verbal Threat under State Rent Control Act');
+      setParticulars('In response to your verbal demand to vacate within 7 days, please note that under Section 16 of Rent Control Act, tenant cannot be dispossessed without 90 days statutory notice or court decree.');
     }
   };
 
@@ -90,40 +102,65 @@ function ApplicationGeneratorContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="max-w-6xl mx-auto space-y-10">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-[#333] pb-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0e6670]/10 dark:bg-[#e7b85b]/10 text-[#0e6670] dark:text-[#e7b85b] text-xs font-extrabold mb-3 border border-[#0e6670]/20 dark:border-[#e7b85b]/30">
-              <span className="animate-pulse">📄</span>
-              <span>Official Statutory Document Engine</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">
-              Application & RTI Generator
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 font-medium">
-              Explain your issue below. Our AI will analyze the facts and format a statutory Section 6(1) RTI, Demand Notice, or Municipal Petition ready for submission.
-            </p>
+    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      {/* Top Header Matching #14505b Dotted Pattern */}
+      <section className="relative overflow-hidden bg-[#14505b] text-white py-16 px-4 sm:px-6 lg:px-8 shadow-xl">
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div className="relative max-w-5xl mx-auto text-center z-10 space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#e7b85b] text-xs font-extrabold shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            <span>Official Statutory Document Engine</span>
           </div>
-          <div className="flex items-center gap-2">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+            Application & Statutory Document Generator
+          </h1>
+          <p className="text-sm sm:text-base text-[#d4eae6] max-w-2xl mx-auto font-medium">
+            Explain your issue below. Our AI will analyze the facts and format a statutory Section 6(1) RTI, Demand Notice, or Municipal Petition ready for submission.
+          </p>
+        </div>
+      </section>
+
+      <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12">
+
+        {/* Preset Selector Ribbon */}
+        <div className="bg-white dark:bg-[#1d1b1b] p-6 rounded-3xl border border-gray-200 dark:border-[#333] shadow-md space-y-3">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-gray-400">Select Template Preset</span>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
             <button
               onClick={() => handleApplyPreset('rti')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${docType === 'rti' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-white dark:bg-[#201e1e] border border-gray-200 dark:border-[#333] text-gray-700 dark:text-gray-300'}`}
+              className={`p-3 rounded-2xl text-xs font-extrabold text-left transition-all ${docType === 'rti' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-gray-50 dark:bg-[#252323] text-gray-700 dark:text-gray-300 hover:bg-gray-100'}`}
             >
-              📜 RTI App
+              📜 Section 6(1) RTI
             </button>
             <button
               onClick={() => handleApplyPreset('landlord_notice')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${docType === 'landlord_notice' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-white dark:bg-[#201e1e] border border-gray-200 dark:border-[#333] text-gray-700 dark:text-gray-300'}`}
+              className={`p-3 rounded-2xl text-xs font-extrabold text-left transition-all ${docType === 'landlord_notice' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-gray-50 dark:bg-[#252323] text-gray-700 dark:text-gray-300 hover:bg-gray-100'}`}
             >
-              🏠 Deposit Notice
+              🏠 Deposit Demand
             </button>
             <button
               onClick={() => handleApplyPreset('municipal')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${docType === 'municipal' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-white dark:bg-[#201e1e] border border-gray-200 dark:border-[#333] text-gray-700 dark:text-gray-300'}`}
+              className={`p-3 rounded-2xl text-xs font-extrabold text-left transition-all ${docType === 'municipal' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-gray-50 dark:bg-[#252323] text-gray-700 dark:text-gray-300 hover:bg-gray-100'}`}
             >
               🏛️ Civic Petition
+            </button>
+            <button
+              onClick={() => handleApplyPreset('consumer')}
+              className={`p-3 rounded-2xl text-xs font-extrabold text-left transition-all ${docType === 'consumer' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-gray-50 dark:bg-[#252323] text-gray-700 dark:text-gray-300 hover:bg-gray-100'}`}
+            >
+              🛍️ Consumer Complaint
+            </button>
+            <button
+              onClick={() => handleApplyPreset('utility')}
+              className={`p-3 rounded-2xl text-xs font-extrabold text-left transition-all ${docType === 'utility' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-gray-50 dark:bg-[#252323] text-gray-700 dark:text-gray-300 hover:bg-gray-100'}`}
+            >
+              ⚡ Electricity Meter
+            </button>
+            <button
+              onClick={() => handleApplyPreset('eviction')}
+              className={`p-3 rounded-2xl text-xs font-extrabold text-left transition-all ${docType === 'eviction' ? 'bg-gradient-to-r from-[#0e6670] to-[#124b55] text-white shadow-md' : 'bg-gray-50 dark:bg-[#252323] text-gray-700 dark:text-gray-300 hover:bg-gray-100'}`}
+            >
+              🛡️ Eviction Reply
             </button>
           </div>
         </div>
@@ -131,10 +168,10 @@ function ApplicationGeneratorContent() {
         {/* AI Input Section */}
         <div className="bg-white dark:bg-[#1d1b1b] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-md">
           <h2 className="text-xl font-black text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-            <span>🤖</span> Step 1: Explain Your Issue
+            <span>🤖</span> Step 1: Explain Your Issue for AI Custom Drafting
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 font-medium">
-            Briefly describe your problem (e.g., "The streetlights in my area have been broken for 3 months despite complaints" or "My landlord is withholding my deposit for painting charges").
+            Briefly describe your problem (e.g., "The streetlights in my area have been broken for 3 months despite complaints" or "Flipkart delivered a broken phone and refused refund").
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -186,6 +223,9 @@ function ApplicationGeneratorContent() {
                 <option value="rti">RTI Application (Section 6(1) RTI Act 2005)</option>
                 <option value="landlord_notice">Landlord Security Deposit Demand Notice</option>
                 <option value="municipal">Municipal Civic Grievance Petition</option>
+                <option value="consumer">Consumer E-Commerce Refund Demand</option>
+                <option value="utility">Electricity Board Meter Testing Request</option>
+                <option value="eviction">Unlawful Eviction Legal Reply</option>
               </select>
             </div>
 
@@ -275,7 +315,7 @@ function ApplicationGeneratorContent() {
               </div>
 
               <div className="text-center font-bold uppercase text-base border-b-2 border-gray-900 pb-3 tracking-wide font-sans">
-                {docType === 'rti' ? 'FORMAL APPLICATION UNDER RIGHT TO INFORMATION ACT 2005' : docType === 'landlord_notice' ? 'LEGAL DEMAND NOTICE FOR SECURITY DEPOSIT REFUND' : 'MUNICIPAL CIVIC PETITION'}
+                {docType === 'rti' ? 'FORMAL APPLICATION UNDER RIGHT TO INFORMATION ACT 2005' : docType === 'landlord_notice' ? 'LEGAL DEMAND NOTICE FOR SECURITY DEPOSIT REFUND' : docType === 'municipal' ? 'MUNICIPAL CIVIC PETITION' : docType === 'consumer' ? 'CONSUMER PROTECTION DEMAND NOTICE' : 'STATUTORY LEGAL APPLICATION'}
               </div>
 
               <div className="text-xs space-y-1 font-sans">
@@ -314,6 +354,76 @@ function ApplicationGeneratorContent() {
             </div>
           </div>
         </div>
+
+        {/* Extended Section 1: Submission Guide & Fee Structure */}
+        <div className="bg-white dark:bg-[#1d1b1b] rounded-3xl p-8 border border-gray-200 dark:border-[#333] shadow-md space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">📮</span>
+            <div>
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white">Submission Instructions & Fee Guide</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">How to dispatch your document to ensure legally binding receipt.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-2xl bg-gray-50 dark:bg-[#252323] border border-gray-200/80 dark:border-[#383535] space-y-2">
+              <span className="text-xs font-black text-[#0e6670] dark:text-[#e7b85b] uppercase">Step 1: Application Fee</span>
+              <h3 className="font-extrabold text-base text-gray-900 dark:text-white">Attach Statutory Fee</h3>
+              <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
+                For RTI Section 6(1), attach a ₹10 Indian Postal Order (IPO), Court Fee Stamp, or Demand Draft payable to the PIO. BPL cardholders are 100% fee-exempt.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-gray-50 dark:bg-[#252323] border border-gray-200/80 dark:border-[#383535] space-y-2">
+              <span className="text-xs font-black text-[#0e6670] dark:text-[#e7b85b] uppercase">Step 2: Dispatch Mode</span>
+              <h3 className="font-extrabold text-base text-gray-900 dark:text-white">Registered AD / Speed Post</h3>
+              <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
+                Always send notices or RTI petitions via Registered Post with Acknowledgment Due (AD) or Speed Post. Retain postal receipts for court evidence.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-gray-50 dark:bg-[#252323] border border-gray-200/80 dark:border-[#383535] space-y-2">
+              <span className="text-xs font-black text-[#0e6670] dark:text-[#e7b85b] uppercase">Step 3: Timeline Clock</span>
+              <h3 className="font-extrabold text-base text-gray-900 dark:text-white">Track Statutory Deadline</h3>
+              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
+                RTI responses are due within 30 days of delivery. Legal demand notices allow 15 days for compliance before filing court petitions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Extended Section 2: Recommended Evidence Attachments */}
+        <div className="bg-white dark:bg-[#1d1b1b] rounded-3xl p-8 border border-gray-200 dark:border-[#333] shadow-md space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">📎</span>
+            <div>
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white">Recommended Annexures & Attachments Checklist</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Strengthen your application by attaching supporting evidence copies.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-[#252323] border border-blue-100 dark:border-[#383535]">
+              <span className="text-xs font-extrabold text-blue-700 dark:text-[#e7b85b]">RTI Applications</span>
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">₹10 IPO Slip + Photo ID Proof Copy + BPL Card (if fee exempt)</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-[#252323] border border-blue-100 dark:border-[#383535]">
+              <span className="text-xs font-extrabold text-blue-700 dark:text-[#e7b85b]">Landlord Notices</span>
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">Rent Agreement Copy + Deposit Bank Slip + Key Handover Receipt</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-[#252323] border border-blue-100 dark:border-[#383535]">
+              <span className="text-xs font-extrabold text-blue-700 dark:text-[#e7b85b]">Consumer Complaints</span>
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">E-Commerce Invoice + Unboxing Video/Photos + Chat Support Logs</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-[#252323] border border-blue-100 dark:border-[#383535]">
+              <span className="text-xs font-extrabold text-blue-700 dark:text-[#e7b85b]">Municipal Petitions</span>
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">Geotagged Hazard Photos + Online Complaint Docket Number</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -321,7 +431,11 @@ function ApplicationGeneratorContent() {
 
 export default function ApplicationGeneratorPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#fbfcf9] dark:bg-[#151414]" />}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#0e6670] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
       <ApplicationGeneratorContent />
     </Suspense>
   );

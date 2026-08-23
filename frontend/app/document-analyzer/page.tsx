@@ -29,12 +29,11 @@ export default function DocumentAnalyzerPage() {
     reader.readAsText(file);
   };
 
-    const handleAnalyze = async () => {
+  const handleAnalyze = async () => {
     if (!docText.trim() && !fileName) return;
 
     setAnalyzing(true);
     try {
-      const { getIdToken } = await import('@/lib/auth');
       const { apiFetch } = await import('@/lib/api');
       
       const res: any = await apiFetch('/platform/analyze-document', {
@@ -58,152 +57,167 @@ export default function DocumentAnalyzerPage() {
       `LEAVE AND LICENSE AGREEMENT
 This agreement made on 1st August 2025 between Landlord Mr. Suresh Mehta and Licensee Mr. Ramesh Kumar.
 1. License Fee: ₹25,000 per month.
-2. Security Deposit: ₹75,000 deposited via NEFT.
-3. Notice Period: 1 Month written notice required.
-4. Forfeiture Clause: Landlord reserves full right to forfeit security deposit if premises painting is required upon move-out.
-5. Maintenance: Licensee shall pay all society maintenance charges.`
+2. Security Deposit: ₹1,50,000 refundable upon expiration.
+3. Lock-in Period: 12 Months. If Licensee vacates early, entire deposit shall be forfeited.
+4. Maintenance: Licensee shall bear all painting, plumbing, and structural wear-and-tear repair costs.
+5. Eviction: Landlord reserves right to terminate agreement with 3 days verbal notice without cause.`
     );
   };
 
   return (
-    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#151414] text-gray-900 dark:text-gray-100 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="max-w-5xl mx-auto space-y-10">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-[#252323] text-blue-700 dark:text-[#e7b85b] text-xs font-bold border border-blue-100 dark:border-[#383535]">
-            <span>🔍</span>
-            <span>AI Document Intelligence</span>
+    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      {/* Top Hero Banner */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0b2b31] via-[#0e6670] to-[#124b55] text-white py-16 px-4 sm:px-6 lg:px-8 shadow-xl">
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div className="relative max-w-5xl mx-auto text-center z-10 space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#e7b85b] text-xs font-extrabold shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            <span>AI Legal Clause Risk & Unfair Contract Scanner</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            Document Analyzer
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+            Document Risk & Agreement Analyzer
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Upload rental agreements, eviction letters, municipal notices, or electricity bills for instant AI risk analysis and clause extraction.
+          <p className="text-sm sm:text-base text-[#d4eae6] max-w-2xl mx-auto font-medium">
+            Paste or upload rental agreements, employment contracts, or notice drafts. CivicSaathi scans for unfair clauses, unlawful forfeiture penalties, and illegal eviction traps.
           </p>
         </div>
+      </section>
 
-        {/* Upload & Input Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 bg-white dark:bg-[#201e1e] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300">
-                Paste Document Text or Drag & Drop File
+      {/* Main Content Area */}
+      <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10">
+        {/* Upload Container */}
+        <div className="bg-white dark:bg-[#1d1b1b] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-md space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">📄</span>
+              <div>
+                <h2 className="text-xl font-black text-gray-900 dark:text-white">Upload or Paste Document Text</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Supports plain text, rental agreements, notices, and contract clauses.</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLoadSample}
+              className="text-xs font-extrabold px-4 py-2 rounded-xl bg-gray-100 dark:bg-[#282525] text-[#0e6670] dark:text-[#e7b85b] border border-gray-200 dark:border-[#383535] hover:bg-gray-200 self-start sm:self-auto"
+            >
+              📋 Load Sample Agreement
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="border-2 border-dashed border-gray-300 dark:border-[#3a3737] rounded-3xl p-6 text-center hover:border-[#0e6670] dark:hover:border-[#e7b85b] transition-colors bg-gray-50/50 dark:bg-[#232121]">
+              <input
+                type="file"
+                accept=".txt,.doc,.docx"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="doc-upload"
+              />
+              <label htmlFor="doc-upload" className="cursor-pointer block space-y-2">
+                <div className="text-3xl">📤</div>
+                <p className="text-xs sm:text-sm font-extrabold text-gray-700 dark:text-gray-300">
+                  {fileName ? `Attached File: ${fileName}` : 'Click to Upload Document File (.txt)'}
+                </p>
+                <p className="text-[11px] text-gray-400 font-medium">Or paste the full agreement text in the box below</p>
               </label>
-              <button
-                onClick={handleLoadSample}
-                className="text-xs font-bold text-[#0e6670] dark:text-[#e7b85b] hover:underline"
-              >
-                Load Sample Agreement
-              </button>
             </div>
 
             <textarea
               rows={8}
               value={docText}
               onChange={(e) => setDocText(e.target.value)}
-              placeholder="Paste text from rental agreement, demand notice, or municipal letter..."
-              className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#282626] text-gray-900 dark:text-white text-xs sm:text-sm outline-none focus:ring-2 focus:ring-[#0e6670] resize-none"
+              placeholder="Paste document text here..."
+              className="w-full px-5 py-4 rounded-2xl border border-gray-200 dark:border-[#333] bg-gray-50 dark:bg-[#252323] text-gray-900 dark:text-white text-xs sm:text-sm outline-none focus:ring-2 focus:ring-[#0e6670] font-mono leading-relaxed resize-none"
             />
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-              <label className="inline-flex items-center gap-2 cursor-pointer bg-gray-100 dark:bg-[#2d2a2a] hover:bg-gray-200 dark:hover:bg-[#3d3a3a] px-4 py-2.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors">
-                <span>📎</span>
-                <span>{fileName ? `Uploaded: ${fileName}` : 'Choose File (.pdf, .txt, .docx)'}</span>
-                <input
-                  type="file"
-                  onChange={handleFileUpload}
-                  accept=".pdf,.txt,.docx,.png,.jpg"
-                  className="hidden"
-                />
-              </label>
-
-              <button
-                onClick={handleAnalyze}
-                disabled={analyzing || (!docText.trim() && !fileName)}
-                className="w-full sm:w-auto bg-[#0e6670] hover:bg-[#094d54] disabled:opacity-40 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-all shadow-sm"
-              >
-                {analyzing ? 'Analyzing Document...' : 'Run AI Document Analysis ⚡'}
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Guide Sidebar */}
-          <div className="bg-blue-50/60 dark:bg-[#201e1e] p-6 rounded-3xl border border-blue-100 dark:border-[#333] space-y-4">
-            <h3 className="font-bold text-gray-900 dark:text-white text-base">What We Analyze</h3>
-            <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-2.5">
-              <li className="flex items-start gap-2">
-                <span className="text-[#0e6670] dark:text-[#e7b85b] font-bold">•</span>
-                <span><strong>Unlawful Forfeiture:</strong> Landlord deposit retention traps.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#0e6670] dark:text-[#e7b85b] font-bold">•</span>
-                <span><strong>Notice Validity:</strong> Statutory 30-day notice compliance.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#0e6670] dark:text-[#e7b85b] font-bold">•</span>
-                <span><strong>RTI Exemption Flags:</strong> Section 8 confidentiality clauses.</span>
-              </li>
-            </ul>
+            <button
+              onClick={handleAnalyze}
+              disabled={analyzing || (!docText.trim() && !fileName)}
+              className="w-full bg-gradient-to-r from-[#0e6670] to-[#124b55] hover:from-[#094d54] hover:to-[#0e3b43] text-white font-extrabold py-4 rounded-2xl transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+            >
+              {analyzing ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Scanning Legal Clauses & Risk Flags...</span>
+                </>
+              ) : (
+                <>
+                  <span>🔍</span>
+                  <span>Analyze Legal Document Risk</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Analysis Output Section */}
+        {/* Analysis Results */}
         {analysisResult && (
-          <div className="bg-white dark:bg-[#201e1e] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-md space-y-6 animate-fadeIn">
+          <div className="bg-white dark:bg-[#1d1b1b] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#333] shadow-xl space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 dark:border-[#2d2a2a] pb-4">
               <div>
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Analysis Complete</span>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{analysisResult.documentType}</h2>
+                <span className="text-xs font-extrabold uppercase tracking-wider text-gray-400">Scan Complete</span>
+                <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-0.5">
+                  Document Audit Report
+                </h3>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                analysisResult.riskLevel === 'High'
-                  ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
-                  : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-              }`}>
-                {analysisResult.riskLevel} Risk Level Detected
-              </span>
-            </div>
-
-            {/* Summary */}
-            <div className="p-4 bg-gray-50 dark:bg-[#282626] rounded-2xl text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-              {analysisResult.summary}
-            </div>
-
-            {/* Risk Flags */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-bold text-red-600 dark:text-red-400 flex items-center gap-1.5">
-                <span>⚠️</span> Identified Risk Flags & Unlawful Terms
-              </h3>
-              <div className="space-y-2">
-                {analysisResult.riskFlags.map((flag, idx) => (
-                  <div key={idx} className="p-3 bg-red-50/60 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 rounded-xl text-xs text-red-900 dark:text-red-200">
-                    {flag}
-                  </div>
-                ))}
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold text-gray-500">Document Type: {analysisResult.documentType}</span>
+                <span
+                  className={`text-xs font-extrabold px-3 py-1 rounded-full ${
+                    analysisResult.riskLevel === 'High'
+                      ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                      : analysisResult.riskLevel === 'Medium'
+                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                      : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                  }`}
+                >
+                  ● {analysisResult.riskLevel} Risk Detected
+                </span>
               </div>
             </div>
 
-            {/* Recommendations */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-                <span>🎯</span> Recommended Next Actions
-              </h3>
-              <ul className="space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                {analysisResult.recommendations.map((rec, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-[#0e6670] dark:text-[#e7b85b] font-bold">✓</span>
-                    <span>{rec}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="p-4 bg-gray-50 dark:bg-[#252323] rounded-2xl border border-gray-100 dark:border-[#353232] space-y-1">
+              <span className="text-xs font-extrabold text-[#0e6670] dark:text-[#e7b85b] uppercase">Executive Summary:</span>
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium leading-relaxed">{analysisResult.summary}</p>
             </div>
 
-            <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 dark:border-[#2d2a2a]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Risk Flags */}
+              <div className="p-5 rounded-2xl bg-rose-50/50 dark:bg-[#291f21] border border-rose-100 dark:border-rose-950/60 space-y-3">
+                <h4 className="text-xs font-extrabold text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🚨</span> Unfair Clauses & Risk Flags
+                </h4>
+                <ul className="space-y-2 text-xs text-gray-700 dark:text-gray-300 font-medium">
+                  {analysisResult.riskFlags.map((flag, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-rose-500 font-extrabold">•</span>
+                      <span>{flag}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Recommendations */}
+              <div className="p-5 rounded-2xl bg-emerald-50/50 dark:bg-[#1a2921] border border-emerald-100 dark:border-emerald-950/60 space-y-3">
+                <h4 className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🛡️</span> Recommended Action & Protection
+                </h4>
+                <ul className="space-y-2 text-xs text-gray-700 dark:text-gray-300 font-medium">
+                  {analysisResult.recommendations.map((rec, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-emerald-500 font-extrabold">•</span>
+                      <span>{rec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
               <Link
-                href="/action-plan"
-                className="bg-[#0e6670] hover:bg-[#094d54] text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all"
+                href="/application-generator"
+                className="bg-gradient-to-r from-[#0e6670] to-[#124b55] hover:from-[#094d54] hover:to-[#0e3b43] text-white font-extrabold text-xs px-6 py-3 rounded-xl shadow-md transition-all"
               >
-                Create Action Plan from this Document →
+                Draft Legal Demand Notice for these Risk Flags →
               </Link>
             </div>
           </div>

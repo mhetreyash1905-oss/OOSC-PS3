@@ -44,98 +44,103 @@ export default function CasesPage() {
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'complete':
-        return { label: 'RTI Ready & Drafted', color: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' };
+        return { label: 'RTI Ready & Drafted', color: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' };
       case 'drafting':
-        return { label: 'Drafting Document', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300' };
+        return { label: 'Drafting Document', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300' };
       case 'recommendation':
-        return { label: 'Strategy Formed', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' };
+        return { label: 'Strategy Formed', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300' };
       case 'rights':
-        return { label: 'Rights Explaining', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' };
+        return { label: 'Rights Explaining', color: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300' };
       default:
-        return { label: 'Active Assessment', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' };
+        return { label: 'Active Assessment', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' };
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#1a1919] text-gray-900 dark:text-gray-100 p-6 md:p-10 transition-colors duration-200">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-200 dark:border-[#333]">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Link href="/platform" className="text-sm text-blue-600 dark:text-orange-400 hover:underline flex items-center gap-1 font-medium">
-                ← Back to CivicSaathi
-              </Link>
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-3">
-              <span>🗂️</span> My Cases & Inquiries
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Review and continue your ongoing civic issues and legal inquiries.
-            </p>
+    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      {/* Top Hero Banner */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0b2b31] via-[#0e6670] to-[#124b55] text-white py-16 px-4 sm:px-6 lg:px-8 shadow-xl">
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div className="relative max-w-5xl mx-auto text-center z-10 space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#e7b85b] text-xs font-extrabold shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            <span>Citizen Case Vault</span>
           </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+            My Cases & Saved Assessments
+          </h1>
+          <p className="text-sm sm:text-base text-[#d4eae6] max-w-2xl mx-auto font-medium">
+            Access your ongoing statutory consultations, generated RTI applications, demand notices, and case histories.
+          </p>
+        </div>
+      </section>
+
+      {/* Content Container */}
+      <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white">Active Case File Directory</h2>
           <Link
             href="/platform"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors"
+            className="bg-gradient-to-r from-[#0e6670] to-[#124b55] hover:from-[#094d54] hover:to-[#0e3b43] text-white font-extrabold text-xs px-5 py-3 rounded-2xl shadow-md transition-all flex items-center gap-2"
           >
-            <span>+</span> Start New Case
+            <span>+</span>
+            <span>New Consultation</span>
           </Link>
         </div>
 
-        {loading || authLoading ? (
-          <div className="py-20 text-center">
-            <div className="w-10 h-10 border-4 border-blue-500 dark:border-orange-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Loading your cases...</p>
+        {loading ? (
+          <div className="p-12 text-center bg-white dark:bg-[#1d1b1b] rounded-3xl border border-gray-200 dark:border-[#333]">
+            <div className="w-8 h-8 border-4 border-[#0e6670] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-xs font-bold text-gray-500">Loading your saved cases...</p>
           </div>
         ) : cases.length === 0 ? (
-          <div className="bg-white dark:bg-[#252323] rounded-2xl p-12 text-center border border-gray-200 dark:border-[#333] shadow-sm">
-            <div className="w-16 h-16 bg-blue-50 dark:bg-[#2d2a2a] text-blue-600 dark:text-orange-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-              🏠
-            </div>
-            <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">No active cases yet</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto mb-6">
-              When you describe your legal or civic problem to CivicSaathi, your case will be tracked and saved here.
+          <div className="p-12 text-center bg-white dark:bg-[#1d1b1b] rounded-3xl border border-gray-200 dark:border-[#333] space-y-4">
+            <div className="text-4xl">📂</div>
+            <h3 className="text-xl font-extrabold text-gray-900 dark:text-white">No Saved Cases Found</h3>
+            <p className="text-xs text-gray-500 max-w-md mx-auto font-medium">
+              You have not started any civic consultations yet. Start an inquiry with CivicSaathi to create your first case file.
             </p>
             <Link
               href="/platform"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm"
+              className="inline-block bg-[#0e6670] text-white font-extrabold text-xs px-6 py-3 rounded-2xl shadow-md"
             >
-              Start Your First Case
+              Start AI Consultation Now →
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {cases.map((c) => {
-              const statusInfo = getStatusDisplay(c.status);
+              const statusDisplay = getStatusDisplay(c.status);
               return (
                 <div
                   key={c.session_id}
-                  className="bg-white dark:bg-[#252323] rounded-xl p-5 border border-gray-200 dark:border-[#333] shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="bg-white dark:bg-[#1d1b1b] rounded-3xl p-6 sm:p-8 border border-gray-200 dark:border-[#333] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-4"
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${statusInfo.color}`}>
-                        {statusInfo.label}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2 border-b border-gray-100 dark:border-[#2c2929] pb-3">
+                      <span className="text-xs font-extrabold px-3 py-1 rounded-full bg-blue-50 dark:bg-[#2c2929] text-blue-700 dark:text-[#e7b85b] border border-blue-100 dark:border-[#3d3a3a]">
+                        {c.category || 'General Consultation'}
                       </span>
-                      {c.category && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                          {c.category}
-                        </span>
-                      )}
+                      <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${statusDisplay.color}`}>
+                        {statusDisplay.label}
+                      </span>
                     </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-base mb-1">
+
+                    <h3 className="text-lg font-extrabold text-gray-900 dark:text-white leading-snug">
                       {c.title}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Initiated: {c.created_at ? new Date(c.created_at).toLocaleDateString() : 'Recent'}
+                    <p className="text-xs text-gray-500 font-medium">
+                      Created: {c.created_at ? new Date(c.created_at).toLocaleDateString() : 'Recent'}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="pt-3 border-t border-gray-100 dark:border-[#2c2929] flex justify-end">
                     <Link
-                      href="/platform"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white transition-colors"
+                      href={`/platform?session_id=${c.session_id}`}
+                      className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#0e6670] dark:text-[#e7b85b] hover:underline"
                     >
-                      Continue Case →
+                      <span>Open Case Workspace</span>
+                      <span>→</span>
                     </Link>
                   </div>
                 </div>

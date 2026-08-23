@@ -24,6 +24,7 @@ async def get_current_user(
 
     user_id = decoded.get("uid")
     email = decoded.get("email")
+    display_name = decoded.get("name") or decoded.get("display_name")
 
     if not user_id or not email:
         raise HTTPException(
@@ -32,4 +33,4 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return {"user_id": user_id, "email": email}
+    return {"user_id": user_id, "email": email, "display_name": display_name}
