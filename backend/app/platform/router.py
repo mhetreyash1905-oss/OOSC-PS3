@@ -16,6 +16,53 @@ class IntakeRequest(BaseModel):
 class SessionRequest(BaseModel):
     session_id: str
 
+class AuthorityRecommendationRequest(BaseModel):
+    state: str
+    pincode: str
+    problem: str
+
+class AuthorityRecommendationResponse(BaseModel):
+    department: str
+    authority_level: str
+    service_categories: list[str]
+    complaint_guidance: str
+
+@router.post("/authority-recommendation")
+async def authority_recommendation(request: AuthorityRecommendationRequest, current_user: dict = Depends(get_current_user)):
+    from google import genai
+    from google.genai import types
+    from app.config import GEMINI_API_KEY
+    import asyncio
+    import json
+    
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key missing")
+        
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    
+    prompt = f"""You are an Indian Government Administrative Expert.
+    Given a user's location (State: {request.state}, Pincode: {request.pincode}) and their problem: "{request.problem}", 
+    identify the correct government department and authority level they need to approach.
+    Also, provide OpenStreetMap service categories (e.g. 'hospital', 'police', 'municipal') that could be searched nearby, 
+    and a short 1-2 sentence guidance on how to file a complaint.
+    """
+    
+    try:
+        response = await asyncio.to_thread(
+            client.models.generate_content,
+            model='gemini-2.5-flash',
+            contents=[types.Content(role="user", parts=[types.Part.from_text(text=prompt)])],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=AuthorityRecommendationResponse,
+                temperature=0.2
+            )
+        )
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"Error in authority recommendation: {e}")
+        raise HTTPException(status_code=500, detail="Failed to find authority recommendation")
+
 @router.get("/sessions/history")
 async def get_session_history(current_user: dict = Depends(get_current_user)):
     """Return the user's past sessions for the sidebar history list."""
