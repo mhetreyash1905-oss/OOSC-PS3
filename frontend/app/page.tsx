@@ -148,21 +148,6 @@ export default function Home() {
         }}
       />
 
-      {/* Custom Glowing Cursor Tracker Ring */}
-      <div
-        className="pointer-events-none fixed z-50 rounded-full border-2 border-[#e7b85b] shadow-[0_0_20px_rgba(231,184,91,0.6)] transition-transform duration-75 ease-out hidden md:block -translate-x-1/2 -translate-y-1/2"
-        style={{
-          left: `${cursorPos.x}px`,
-          top: `${cursorPos.y}px`,
-          width: '36px',
-          height: '36px',
-          opacity: isHovered ? 1 : 0
-        }}
-      >
-        <div className="w-2 h-2 bg-[#e7b85b] rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-ping opacity-75"></div>
-        <div className="w-1.5 h-1.5 bg-[#e7b85b] rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-      </div>
-
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0b2b31] via-[#0e6670] to-[#124b55] text-white py-24 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:28px_28px]"></div>
