@@ -102,23 +102,25 @@ function ApplicationGeneratorContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="max-w-6xl mx-auto space-y-12">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-[#333] pb-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0e6670]/10 dark:bg-[#e7b85b]/10 text-[#0e6670] dark:text-[#e7b85b] text-xs font-extrabold mb-3 border border-[#0e6670]/20 dark:border-[#e7b85b]/30">
-              <span className="animate-pulse">📄</span>
-              <span>Official Statutory Document Engine</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">
-              Application & Statutory Document Generator
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 font-medium max-w-2xl">
-              Explain your issue below. Our AI will analyze the facts and format a statutory Section 6(1) RTI, Demand Notice, or Municipal Petition ready for submission.
-            </p>
+    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      {/* Top Header Matching #14505b Dotted Pattern */}
+      <section className="relative overflow-hidden bg-[#14505b] text-white py-16 px-4 sm:px-6 lg:px-8 shadow-xl">
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div className="relative max-w-5xl mx-auto text-center z-10 space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#e7b85b] text-xs font-extrabold shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            <span>Official Statutory Document Engine</span>
           </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
+            Application & Statutory Document Generator
+          </h1>
+          <p className="text-sm sm:text-base text-[#d4eae6] max-w-2xl mx-auto font-medium">
+            Explain your issue below. Our AI will analyze the facts and format a statutory Section 6(1) RTI, Demand Notice, or Municipal Petition ready for submission.
+          </p>
         </div>
+      </section>
+
+      <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12">
 
         {/* Preset Selector Ribbon */}
         <div className="bg-white dark:bg-[#1d1b1b] p-6 rounded-3xl border border-gray-200 dark:border-[#333] shadow-md space-y-3">

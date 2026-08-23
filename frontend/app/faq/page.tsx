@@ -84,21 +84,25 @@ export default function FAQPage() {
     : faqs.filter(f => f.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#151414] text-gray-900 dark:text-gray-100 py-16 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-[#252323] text-blue-700 dark:text-[#e7b85b] text-xs font-bold border border-blue-100 dark:border-[#383535] mb-4">
-            <span>❓</span>
+    <div className="min-h-screen bg-[#fbfcf9] dark:bg-[#121111] text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      {/* Top Header Matching #14505b Dotted Pattern */}
+      <section className="relative overflow-hidden bg-[#14505b] text-white py-16 px-4 sm:px-6 lg:px-8 shadow-xl">
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#e7b85b_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div className="relative max-w-5xl mx-auto text-center z-10 space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#e7b85b] text-xs font-extrabold shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
             <span>Citizen Knowledge Base</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
             Frequently Asked Questions
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm sm:text-base max-w-xl mx-auto">
+          <p className="text-sm sm:text-base text-[#d4eae6] max-w-2xl mx-auto font-medium">
             Everything you need to know about tenancy laws, RTI filing, municipal grievance redressal, and CivicSaathi.
           </p>
         </div>
+      </section>
+
+      <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
 
         {/* Category Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
