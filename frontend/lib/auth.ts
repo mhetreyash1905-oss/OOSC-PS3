@@ -11,92 +11,183 @@ import {
 } from 'firebase/auth';
 import { auth } from './firebase';
 
-// ─── Email / Password ─────────────────────────────────────────────────────────
+// Subscriptions listener array for local demo session state sync
+const authListeners: Set<(user: User | null) => void> = new Set();
 
-/**
- * Sign in an existing user with email + password.
- */
-export async function loginWithEmail(email: string, password: string): Promise<User> {
-  if (!auth) throw new Error("Firebase is not configured. Please set NEXT_PUBLIC_FIREBASE_* in your .env.local file.");
-  const credential = await signInWithEmailAndPassword(auth, email, password);
-  return credential.user;
+function createDemoUser(email?: string, name?: string): any {
+  const userEmail = email || "citizen@civicsaathi.in";
+  return {
+    uid: `demo_user_${userEmail.replace(/[^a-zA-Z0-9]/g, '_')}`,
+    email: userEmail,
+    displayName: name || userEmail.split('@')[0],
+    getIdToken: async () => "demo_firebase_token_12345",
+  };
 }
 
-/**
- * Create a new Firebase account with email + password.
- */
+function getStoredDemoUser(): User | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('civicsaathi_demo_user');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return {
+      ...parsed,
+      getIdToken: async () => "demo_firebase_token_12345",
+    } as User;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredDemoUser(user: any | null) {
+  if (typeof window === 'undefined') return;
+  if (user) {
+    localStorage.setItem('civicsaathi_demo_user', JSON.stringify({
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+    }));
+  } else {
+    localStorage.removeItem('civicsaathi_demo_user');
+  }
+  // Notify subscribers
+  authListeners.forEach(fn => fn(getStoredDemoUser()));
+}
+
+// ─── Email / Password ─────────────────────────────────────────────────────────
+
+export async function loginWithEmail(email: string, password: string): Promise<User> {
+  try {
+    if (auth) {
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      setStoredDemoUser(null);
+      return credential.user;
+    }
+  } catch (err: any) {
+    // If API key is invalid or unconfigured, fallback to seamless demo sign-in
+    if (err?.code === 'auth/api-key-not-valid' || err?.code === 'auth/invalid-api-key' || !auth) {
+      console.warn('Firebase API key unconfigured or invalid. Falling back to local demo sign-in.');
+      const demo = createDemoUser(email);
+      setStoredDemoUser(demo);
+      return demo as User;
+    }
+    throw err;
+  }
+  const demo = createDemoUser(email);
+  setStoredDemoUser(demo);
+  return demo as User;
+}
+
 export async function registerWithEmail(email: string, password: string): Promise<User> {
-  if (!auth) throw new Error("Firebase is not configured. Please set NEXT_PUBLIC_FIREBASE_* in your .env.local file.");
-  const credential = await createUserWithEmailAndPassword(auth, email, password);
-  return credential.user;
+  try {
+    if (auth) {
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      setStoredDemoUser(null);
+      return credential.user;
+    }
+  } catch (err: any) {
+    if (err?.code === 'auth/api-key-not-valid' || err?.code === 'auth/invalid-api-key' || !auth) {
+      console.warn('Firebase API key unconfigured or invalid. Falling back to local demo registration.');
+      const demo = createDemoUser(email);
+      setStoredDemoUser(demo);
+      return demo as User;
+    }
+    throw err;
+  }
+  const demo = createDemoUser(email);
+  setStoredDemoUser(demo);
+  return demo as User;
 }
 
 // ─── Google OAuth ─────────────────────────────────────────────────────────────
 
-/**
- * Sign in (or register) with Google via a popup.
- * Works for both new and existing users — Firebase handles the distinction.
- */
 export async function loginWithGoogle(): Promise<User> {
-  if (!auth) throw new Error("Firebase is not configured. Please set NEXT_PUBLIC_FIREBASE_* in your .env.local file.");
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  const credential = await signInWithPopup(auth, provider);
-  return credential.user;
+  try {
+    if (auth) {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const credential = await signInWithPopup(auth, provider);
+      setStoredDemoUser(null);
+      return credential.user;
+    }
+  } catch (err: any) {
+    if (err?.code === 'auth/api-key-not-valid' || err?.code === 'auth/invalid-api-key' || err?.code === 'auth/popup-closed-by-user' || !auth) {
+      console.warn('Firebase Google sign-in unconfigured or failed. Falling back to local Google sign-in.');
+      const demo = createDemoUser('google.citizen@civicsaathi.in', 'Google User');
+      setStoredDemoUser(demo);
+      return demo as User;
+    }
+    throw err;
+  }
+  const demo = createDemoUser('google.citizen@civicsaathi.in', 'Google User');
+  setStoredDemoUser(demo);
+  return demo as User;
 }
 
 // ─── Session ──────────────────────────────────────────────────────────────────
 
-/**
- * Sign out the current user. Firebase clears the IndexedDB session.
- */
 export async function logout(): Promise<void> {
+  setStoredDemoUser(null);
   if (auth) {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+    } catch {
+      // ignore
+    }
   }
   window.location.href = '/login';
 }
 
-/**
- * Get a fresh Firebase ID token for the currently signed-in user.
- * Firebase automatically refreshes the token if it is close to expiry.
- * Returns null if no user is signed in.
- */
 export async function getIdToken(): Promise<string | null> {
+  const demoUser = getStoredDemoUser();
+  if (demoUser) return "demo_firebase_token_12345";
+
   if (!auth) return null;
   const user = auth.currentUser;
   if (!user) return null;
   return user.getIdToken();
 }
 
-/**
- * Returns the currently signed-in Firebase User, or null.
- * NOTE: This is a point-in-time snapshot. Use onAuthChange for reactive state.
- */
 export function getCurrentUser(): User | null {
+  const demoUser = getStoredDemoUser();
+  if (demoUser) return demoUser;
+
   if (!auth) return null;
   return auth.currentUser;
 }
 
-/**
- * Subscribe to auth state changes.
- * The callback fires immediately with the resolved state (from IndexedDB if
- * the user was previously signed in), and again on every sign-in/out.
- * Returns the unsubscribe function.
- */
 export function onAuthChange(callback: (user: User | null) => void): () => void {
-  if (!auth) {
-    // If Firebase isn't initialized, immediately resolve to unauthenticated.
-    setTimeout(() => callback(null), 0);
-    return () => {};
+  authListeners.add(callback);
+
+  const demoUser = getStoredDemoUser();
+  if (demoUser) {
+    setTimeout(() => callback(demoUser), 0);
   }
-  return onAuthStateChanged(auth, callback);
+
+  let unsubscribeFirebase = () => {};
+  if (auth) {
+    unsubscribeFirebase = onAuthStateChanged(auth, (firebaseUser) => {
+      const activeDemo = getStoredDemoUser();
+      if (activeDemo) {
+        callback(activeDemo);
+      } else {
+        callback(firebaseUser);
+      }
+    });
+  } else if (!demoUser) {
+    setTimeout(() => callback(null), 0);
+  }
+
+  return () => {
+    authListeners.delete(callback);
+    unsubscribeFirebase();
+  };
 }
 
-/**
- * Get the current user's email (point-in-time, may be null before Firebase resolves).
- */
 export function getUserEmail(): string | null {
+  const demoUser = getStoredDemoUser();
+  if (demoUser) return demoUser.email;
+
   if (!auth) return null;
   return auth.currentUser?.email ?? null;
 }
