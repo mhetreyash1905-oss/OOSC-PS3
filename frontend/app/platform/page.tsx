@@ -499,7 +499,7 @@ export default function PlatformPage() {
         <div className="p-4 flex gap-2 border-b border-gray-100 dark:border-[#2b2929]">
           <button
             onClick={resetChat}
-            className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white py-2.5 px-3.5 rounded-xl transition-all shadow-sm text-sm font-semibold group"
+            className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-[#0e6670] dark:hover:bg-[#094d54] text-white py-2.5 px-3.5 rounded-xl transition-all shadow-sm text-sm font-semibold group"
           >
             <span className="text-lg leading-none font-light group-hover:rotate-90 transition-transform">+</span>
             New conversation
@@ -595,7 +595,7 @@ export default function PlatformPage() {
                       ) : (
                         <div className={`flex items-center justify-between w-full text-left px-2 py-1.5 text-xs font-medium rounded-xl transition-colors ${
                           sessionId === session.session_id
-                            ? 'bg-blue-50 dark:bg-[#2f2c2c] text-blue-700 dark:text-orange-300 font-semibold'
+                            ? 'bg-blue-50 dark:bg-[#2f2c2c] text-blue-700 dark:text-[#e7b85b] font-semibold'
                             : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2b2929] hover:text-gray-900 dark:hover:text-gray-200'
                         }`}>
                           <button
@@ -654,7 +654,7 @@ export default function PlatformPage() {
         {/* Sidebar Footer Info */}
         <div className="p-3 border-t border-gray-100 dark:border-[#2b2929] bg-gray-50/50 dark:bg-[#1a1919]/50">
           <div className="flex items-center gap-2.5 px-2 py-1.5">
-            <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-orange-950 flex items-center justify-center text-xs text-blue-700 dark:text-orange-300 font-bold">
+            <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-[#0b2b31] flex items-center justify-center text-xs text-blue-700 dark:text-[#e7b85b] font-bold">
               CS
             </div>
             <div className="flex-1 min-w-0">
@@ -730,7 +730,7 @@ export default function PlatformPage() {
               <form onSubmit={handleSendMessage} className="flex flex-col">
                 {/* Document Attached Preview Chip */}
                 {attachedFile && (
-                  <div className="mb-2 mx-2 p-2 bg-blue-50 dark:bg-[#2d2a2a] rounded-xl flex items-center justify-between text-xs text-blue-800 dark:text-orange-300 border border-blue-100 dark:border-[#3d3a3a]">
+                  <div className="mb-2 mx-2 p-2 bg-blue-50 dark:bg-[#2d2a2a] rounded-xl flex items-center justify-between text-xs text-blue-800 dark:text-[#e7b85b] border border-blue-100 dark:border-[#3d3a3a]">
                     <div className="flex items-center gap-2 truncate">
                       <span>📎</span>
                       <span className="font-semibold truncate">{attachedFile.name}</span>
@@ -813,7 +813,7 @@ export default function PlatformPage() {
                   <button
                     type="submit"
                     disabled={!inputText.trim() && !attachedFile}
-                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 disabled:opacity-40 text-white font-semibold text-sm px-5 py-2 rounded-xl transition-all shadow-sm"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-[#0e6670] dark:hover:bg-[#094d54] disabled:opacity-40 text-white font-semibold text-sm px-5 py-2 rounded-xl transition-all shadow-sm"
                   >
                     <span>Ask CivicSaathi</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -838,7 +838,7 @@ export default function PlatformPage() {
                     🏠
                   </span>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-orange-400">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-[#e7b85b]">
                       "Mere landlord ne security deposit wapas nahi kiya."
                     </h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -855,7 +855,7 @@ export default function PlatformPage() {
                     🏛️
                   </span>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-orange-400">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-[#e7b85b]">
                       "Municipal corporation not repairing road & water pipeline."
                     </h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -872,7 +872,7 @@ export default function PlatformPage() {
                     📜
                   </span>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-orange-400">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-[#e7b85b]">
                       "How do I file an RTI for road tender and expenditure?"
                     </h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -889,7 +889,7 @@ export default function PlatformPage() {
                     ⚖️
                   </span>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-orange-400">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-[#e7b85b]">
                       "Landlord gave sudden eviction notice without 30 days notice."
                     </h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -923,7 +923,7 @@ export default function PlatformPage() {
                       <div className="max-w-[95%] sm:max-w-[85%] rounded-3xl rounded-tl-sm p-6 bg-white dark:bg-[#232121] border border-gray-200 dark:border-[#343131] shadow-md">
                         {/* Header with Avatar */}
                         <div className="flex items-center gap-2.5 mb-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-orange-500 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                          <div className="w-8 h-8 rounded-full bg-blue-600 dark:bg-[#0e6670] text-white flex items-center justify-center font-bold text-xs shadow-sm">
                             🤖
                           </div>
                           <div>
@@ -940,7 +940,7 @@ export default function PlatformPage() {
                         {/* Issue Detected Card */}
                         {msg.issue_detected && (
                           <div className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-[#2a2828] dark:to-[#302c2c] border border-blue-100 dark:border-[#3d3838]">
-                            <span className="text-xs uppercase font-semibold text-blue-700 dark:text-orange-400 tracking-wider block mb-1">
+                            <span className="text-xs uppercase font-semibold text-blue-700 dark:text-[#e7b85b] tracking-wider block mb-1">
                               Issue detected:
                             </span>
                             <div className="flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white">
@@ -959,7 +959,7 @@ export default function PlatformPage() {
                             <ul className="space-y-2">
                               {msg.suggested_actions.map((action, idx) => (
                                 <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                  <span className="text-blue-600 dark:text-orange-400 font-bold shrink-0 mt-0.5">•</span>
+                                  <span className="text-blue-600 dark:text-[#e7b85b] font-bold shrink-0 mt-0.5">•</span>
                                   <span>{action}</span>
                                 </li>
                               ))}
@@ -999,13 +999,13 @@ export default function PlatformPage() {
                 {isTyping && (
                   <div className="flex justify-start">
                     <div className="bg-white dark:bg-[#232121] border border-gray-200 dark:border-[#333] rounded-2xl px-5 py-3.5 shadow-sm flex items-center gap-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-600 dark:bg-orange-500 text-white flex items-center justify-center font-bold text-[10px]">
+                      <div className="w-6 h-6 rounded-full bg-blue-600 dark:bg-[#0e6670] text-white flex items-center justify-center font-bold text-[10px]">
                         🤖
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 bg-blue-500 dark:bg-orange-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-blue-500 dark:bg-orange-400 rounded-full animate-bounce delay-100"></div>
-                        <div className="w-2 h-2 bg-blue-500 dark:bg-orange-400 rounded-full animate-bounce delay-200"></div>
+                        <div className="w-2 h-2 bg-blue-500 dark:bg-[#e7b85b] rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-blue-500 dark:bg-[#e7b85b] rounded-full animate-bounce delay-100"></div>
+                        <div className="w-2 h-2 bg-blue-500 dark:bg-[#e7b85b] rounded-full animate-bounce delay-200"></div>
                       </div>
                       <span className="text-xs text-gray-400 ml-1">CivicSaathi is analyzing...</span>
                     </div>
@@ -1017,19 +1017,19 @@ export default function PlatformPage() {
                   <div className="mt-8 pt-6 border-t border-gray-200 dark:border-[#333] space-y-6">
                     {/* Pipeline Progress Breadcrumb */}
                     <div className="flex items-center justify-between bg-white dark:bg-[#232121] p-3 rounded-2xl border border-gray-200 dark:border-[#333] text-xs font-medium text-gray-500">
-                      <div className={`flex items-center gap-1.5 ${step >= 1 ? 'text-blue-600 dark:text-orange-400 font-bold' : ''}`}>
+                      <div className={`flex items-center gap-1.5 ${step >= 1 ? 'text-blue-600 dark:text-[#e7b85b] font-bold' : ''}`}>
                         <span>1. Issue Assessment</span>
                       </div>
                       <span>→</span>
-                      <div className={`flex items-center gap-1.5 ${step >= 2 ? 'text-blue-600 dark:text-orange-400 font-bold' : ''}`}>
+                      <div className={`flex items-center gap-1.5 ${step >= 2 ? 'text-blue-600 dark:text-[#e7b85b] font-bold' : ''}`}>
                         <span>2. Legal Rights</span>
                       </div>
                       <span>→</span>
-                      <div className={`flex items-center gap-1.5 ${step >= 3 ? 'text-blue-600 dark:text-orange-400 font-bold' : ''}`}>
+                      <div className={`flex items-center gap-1.5 ${step >= 3 ? 'text-blue-600 dark:text-[#e7b85b] font-bold' : ''}`}>
                         <span>3. Strategy</span>
                       </div>
                       <span>→</span>
-                      <div className={`flex items-center gap-1.5 ${step >= 4 ? 'text-blue-600 dark:text-orange-400 font-bold' : ''}`}>
+                      <div className={`flex items-center gap-1.5 ${step >= 4 ? 'text-blue-600 dark:text-[#e7b85b] font-bold' : ''}`}>
                         <span>4. Official RTI Draft</span>
                       </div>
                     </div>
@@ -1054,7 +1054,7 @@ export default function PlatformPage() {
 
                         {isGeneratingRights || !rightsData ? (
                           <div className="py-12 text-center">
-                            <div className="w-10 h-10 border-4 border-blue-500 dark:border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <div className="w-10 h-10 border-4 border-blue-500 dark:border-[#0e6670] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                             <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                               Retrieving statutory sections & case law from knowledge base...
                             </p>
@@ -1132,7 +1132,7 @@ export default function PlatformPage() {
 
                         {isGeneratingRecommendation || !recommendationData ? (
                           <div className="py-12 text-center">
-                            <div className="w-10 h-10 border-4 border-blue-500 dark:border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <div className="w-10 h-10 border-4 border-blue-500 dark:border-[#0e6670] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                             <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                               Formulating recommended grievance and legal strategy...
                             </p>
@@ -1140,7 +1140,7 @@ export default function PlatformPage() {
                         ) : (
                           <div>
                             <div className="bg-blue-50/70 dark:bg-[#2c2929] rounded-2xl p-5 border border-blue-100 dark:border-[#3d3a3a] mb-6">
-                              <h3 className="text-sm font-bold text-blue-900 dark:text-orange-300 mb-2">Strategy Breakdown</h3>
+                              <h3 className="text-sm font-bold text-blue-900 dark:text-[#e7b85b] mb-2">Strategy Breakdown</h3>
                               <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
                                 {recommendationData.recommendation_text}
                               </p>
@@ -1166,7 +1166,7 @@ export default function PlatformPage() {
                               </button>
                               <button
                                 onClick={() => setStep(4)}
-                                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-md transition-all"
+                                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-[#0e6670] dark:hover:bg-[#094d54] text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-md transition-all"
                               >
                                 <span>Generate Official RTI Application</span>
                                 <span>→</span>
@@ -1190,7 +1190,7 @@ export default function PlatformPage() {
 
                         {isDraftingRTI || !rtiData ? (
                           <div className="py-12 text-center">
-                            <div className="w-10 h-10 border-4 border-blue-500 dark:border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <div className="w-10 h-10 border-4 border-blue-500 dark:border-[#0e6670] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                             <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                               Drafting official questions and identifying Public Information Officer (PIO)...
                             </p>
@@ -1267,7 +1267,7 @@ export default function PlatformPage() {
               <div className="max-w-3xl mx-auto">
                 <form
                   onSubmit={handleSendMessage}
-                  className="flex items-center bg-gray-50 dark:bg-[#252323] border border-gray-200 dark:border-[#363333] rounded-2xl overflow-hidden p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-orange-500 transition-all"
+                  className="flex items-center bg-gray-50 dark:bg-[#252323] border border-gray-200 dark:border-[#363333] rounded-2xl overflow-hidden p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-[#e7b85b] transition-all"
                 >
                   <button
                     type="button"
@@ -1292,7 +1292,7 @@ export default function PlatformPage() {
                   <button
                     type="submit"
                     disabled={isTyping || step !== 1 || !inputText.trim()}
-                    className="bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 disabled:opacity-40 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
+                    className="bg-blue-600 hover:bg-blue-700 dark:bg-[#0e6670] dark:hover:bg-[#094d54] disabled:opacity-40 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
                   >
                     <span>Ask CivicSaathi</span>
                     <span>→</span>

@@ -211,7 +211,7 @@ export default function SchemeEligibilityPage() {
                   </a>
                   <Link
                     href="/application-generator"
-                    className="text-xs font-extrabold text-blue-600 dark:text-orange-400 hover:underline"
+                    className="text-xs font-extrabold text-blue-600 dark:text-[#e7b85b] hover:underline"
                   >
                     Draft Exemption Letter →
                   </Link>

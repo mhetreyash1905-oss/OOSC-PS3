@@ -77,7 +77,7 @@ export default function SavedDocumentsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-200 dark:border-[#333]">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Link href="/platform" className="text-sm text-blue-600 dark:text-orange-400 hover:underline flex items-center gap-1 font-medium">
+              <Link href="/platform" className="text-sm text-blue-600 dark:text-[#e7b85b] hover:underline flex items-center gap-1 font-medium">
                 ← Back to CivicSaathi
               </Link>
             </div>
@@ -90,7 +90,7 @@ export default function SavedDocumentsPage() {
           </div>
           <Link
             href="/platform"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-[#0e6670] dark:hover:bg-[#094d54] text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors"
           >
             <span>+</span> Draft New Document
           </Link>
@@ -98,12 +98,12 @@ export default function SavedDocumentsPage() {
 
         {loading || authLoading ? (
           <div className="py-20 text-center">
-            <div className="w-10 h-10 border-4 border-blue-500 dark:border-orange-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-10 h-10 border-4 border-blue-500 dark:border-[#e7b85b] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-500 dark:text-gray-400 text-sm">Loading your legal documents...</p>
           </div>
         ) : documents.length === 0 ? (
           <div className="bg-white dark:bg-[#252323] rounded-2xl p-12 text-center border border-gray-200 dark:border-[#333] shadow-sm">
-            <div className="w-16 h-16 bg-blue-50 dark:bg-[#2d2a2a] text-blue-600 dark:text-orange-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+            <div className="w-16 h-16 bg-blue-50 dark:bg-[#2d2a2a] text-blue-600 dark:text-[#e7b85b] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
               📄
             </div>
             <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">No saved documents yet</h2>
@@ -112,7 +112,7 @@ export default function SavedDocumentsPage() {
             </p>
             <Link
               href="/platform"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-[#0e6670] dark:hover:bg-[#094d54] text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm"
             >
               Ask CivicSaathi to Draft an RTI
             </Link>
@@ -151,7 +151,7 @@ export default function SavedDocumentsPage() {
                   <button
                     onClick={() => handleDownload(doc.session_id)}
                     disabled={downloadingId === doc.session_id}
-                    className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 disabled:opacity-50 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors"
+                    className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-[#0e6670] dark:hover:bg-[#094d54] disabled:opacity-50 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors"
                   >
                     <span>⬇️</span> {downloadingId === doc.session_id ? 'Generating...' : 'Download PDF'}
                   </button>

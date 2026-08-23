@@ -208,7 +208,7 @@ export default function Home() {
               </p>
 
               <div className="p-3.5 bg-blue-50/80 dark:bg-[#2d2929] rounded-xl border border-blue-100 dark:border-[#3d3a3a]">
-                <span className="text-[10px] font-extrabold text-blue-800 dark:text-orange-300 uppercase tracking-wider block mb-1">
+                <span className="text-[10px] font-extrabold text-blue-800 dark:text-[#e7b85b] uppercase tracking-wider block mb-1">
                   Issue Detected:
                 </span>
                 <div className="font-extrabold text-gray-900 dark:text-white text-sm">
