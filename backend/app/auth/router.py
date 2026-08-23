@@ -48,6 +48,7 @@ async def register(profile: UserProfileCreate, current_user: dict = Depends(get_
     first_name = profile.first_name or fb_first
     last_name = profile.last_name or fb_last
     gender = profile.gender or "prefer-not-to-say"
+    phone = profile.phone or ""
 
     user_doc = {
         "_id": uid,
@@ -55,6 +56,7 @@ async def register(profile: UserProfileCreate, current_user: dict = Depends(get_
         "first_name": first_name,
         "last_name": last_name,
         "gender": gender,
+        "phone": phone,
         "avatar": "",
         "bio": "",
         "created_at": datetime.utcnow(),
@@ -68,6 +70,7 @@ async def register(profile: UserProfileCreate, current_user: dict = Depends(get_
         "first_name": first_name,
         "last_name": last_name,
         "gender": gender,
+        "phone": phone,
     }
 
 

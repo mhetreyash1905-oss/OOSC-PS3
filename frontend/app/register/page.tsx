@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [gender, setGender] = useState('prefer-not-to-say');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -51,7 +52,7 @@ export default function RegisterPage() {
 
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !confirmPassword || !firstName || !lastName) {
+    if (!email || !password || !confirmPassword || !firstName || !lastName || !phone) {
       setError('Please fill in all fields'); return;
     }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
@@ -66,7 +67,7 @@ export default function RegisterPage() {
       // Step 2 — save profile to MongoDB (apiFetch auto-attaches Firebase ID token)
       await apiFetch('/auth/register', {
         method: 'POST',
-        body: { first_name: firstName, last_name: lastName, gender },
+        body: { first_name: firstName, last_name: lastName, gender, phone: phone },
       });
 
       router.push('/platform');

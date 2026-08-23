@@ -29,33 +29,27 @@ export default function DocumentAnalyzerPage() {
     reader.readAsText(file);
   };
 
-  const handleAnalyze = () => {
+    const handleAnalyze = async () => {
     if (!docText.trim() && !fileName) return;
 
     setAnalyzing(true);
-    setTimeout(() => {
-      // Generate AI document breakdown
-      setAnalysisResult({
-        summary: `Document '${fileName || 'Pasted Legal Text'}' analyzed. Contains a 11-month leave and license agreement structure under Maharashtra Rent Control Act principles.`,
-        documentType: 'Tenancy Leave & License Agreement',
-        riskLevel: 'Medium',
-        keyClauses: [
-          'Section 4: Security Deposit of ₹75,000 refundable within 30 days of vacant possession.',
-          'Section 9: Notice period of 1 month required prior to termination by either party.',
-          'Section 12: Maintenance fees payable by licensee.'
-        ],
-        riskFlags: [
-          '⚠️ Clause 4.2 states landlord can forfeit full deposit for minor wall paint wear (Unlawful forfeiture risk).',
-          '⚠️ Agreement lacks Section 55 registration details (Unregistered agreement penalty).'
-        ],
-        recommendations: [
-          'Send written notice requesting itemized repair quotes before vacating.',
-          'Issue formal demand notice if deposit is not returned within 15 days of key handover.',
-          'Preserve payment receipts and apartment handover video.'
-        ]
+    try {
+      const { getIdToken } = await import('@/lib/auth');
+      const { apiFetch } = await import('@/lib/api');
+      
+      const res: any = await apiFetch('/platform/analyze-document', {
+        method: 'POST',
+        body: { text: docText, filename: fileName || '' }
       });
+      
+      if (res?.error) throw new Error(res.error);
+      setAnalysisResult(res);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to analyze document. Please ensure you are logged in and your connection is stable.');
+    } finally {
       setAnalyzing(false);
-    }, 1200);
+    }
   };
 
   const handleLoadSample = () => {
