@@ -60,6 +60,26 @@ html.dark body {
   outline-offset: 2px;
 }
 
+/* Floating Animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Typing bounce animation for AI thinking state */
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+}
+
+.typing-dot {
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
 /* Glassmorphism Primitives */
 .glass-panel {
   background: rgba(255, 255, 255, 0.75);

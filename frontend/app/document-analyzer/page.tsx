@@ -37,12 +37,12 @@ export default function DocumentAnalyzerPage() {
       const { getIdToken } = await import('@/lib/auth');
       const { apiFetch } = await import('@/lib/api');
       
-      const res = await apiFetch('/platform/analyze-document', {
+      const res: any = await apiFetch('/platform/analyze-document', {
         method: 'POST',
         body: { text: docText, filename: fileName || '' }
       });
       
-      if (res.error) throw new Error(res.error);
+      if (res?.error) throw new Error(res.error);
       setAnalysisResult(res);
     } catch (e) {
       console.error(e);
