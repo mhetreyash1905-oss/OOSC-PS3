@@ -4,7 +4,7 @@ from app.config import MONGODB_URI, DATABASE_NAME
 
 logger = logging.getLogger(__name__)
 
-client = AsyncIOMotorClient(MONGODB_URI, serverSelectionTimeoutMS=10000, connectTimeoutMS=10000)
+client = AsyncIOMotorClient(MONGODB_URI, serverSelectionTimeoutMS=10000, connectTimeoutMS=10000, tls=True, retryWrites=True)
 db = client[DATABASE_NAME]
 
 users_collection = db["users"]
