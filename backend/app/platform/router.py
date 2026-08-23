@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from datetime import datetime
+import asyncio
+import json
 from bson import ObjectId
 from app.auth.dependencies import get_current_user
 from app.database import sessions_collection
@@ -17,9 +19,9 @@ class SessionRequest(BaseModel):
     session_id: str
 
 class AuthorityRecommendationRequest(BaseModel):
-    state: str
-    pincode: str
-    problem: str
+    state: str = Field(min_length=2, max_length=80)
+    pincode: str = Field(pattern=r"^\d{6}$")
+    problem: str = Field(min_length=3, max_length=1000)
 
 class AuthorityRecommendationResponse(BaseModel):
     department: str
@@ -28,41 +30,61 @@ class AuthorityRecommendationResponse(BaseModel):
     complaint_guidance: str
 
 @router.post("/authority-recommendation")
-async def authority_recommendation(request: AuthorityRecommendationRequest, current_user: dict = Depends(get_current_user)):
+async def authority_recommendation(request: AuthorityRecommendationRequest):
     from google import genai
     from google.genai import types
     from app.config import GEMINI_API_KEY
-    import asyncio
-    import json
-    
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API Key missing")
-        
+
     client = genai.Client(api_key=GEMINI_API_KEY)
-    
-    prompt = f"""You are an Indian Government Administrative Expert.
-    Given a user's location (State: {request.state}, Pincode: {request.pincode}) and their problem: "{request.problem}", 
-    identify the correct government department and authority level they need to approach.
-    Also, provide OpenStreetMap service categories (e.g. 'hospital', 'police', 'municipal') that could be searched nearby, 
-    and a short 1-2 sentence guidance on how to file a complaint.
-    """
-    
+    prompt = """You identify the correct Indian public department for a citizen complaint.
+Return JSON only. Choose one primary department and authority level, then 2 to 5
+specific service categories that should be searched nearby for this exact problem.
+Do not list unrelated services. Do not invent an officer name, phone number, MLA,
+or government URL. Keep complaint guidance under 240 characters.
+Examples: electricity outage -> Electricity Distribution Company, service categories
+electricity complaint office and power substation; street crime -> Police Department,
+police station and women help desk; garbage -> Municipal Corporation, ward office
+and sanitation office.
+"""
+    user_message = f"State: {request.state}\nPIN code: {request.pincode}\nProblem: {request.problem}"
     try:
-        response = await asyncio.to_thread(
+        response = await asyncio.wait_for(asyncio.to_thread(
             client.models.generate_content,
-            model='gemini-1.5-flash',
-            contents=[types.Content(role="user", parts=[types.Part.from_text(text=prompt)])],
+            model="gemini-3.6-flash",
+            contents=[types.Content(role="user", parts=[types.Part.from_text(text=user_message)])],
             config=types.GenerateContentConfig(
+                system_instruction=prompt,
                 response_mime_type="application/json",
                 response_schema=AuthorityRecommendationResponse,
-                temperature=0.2
-            )
-        )
+                temperature=0.1,
+            ),
+        ), timeout=15)
         return json.loads(response.text)
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Failed to find authority recommendation: {str(e)}")
+    except Exception:
+        problem = request.problem.lower()
+        if any(word in problem for word in ["electric", "power", "voltage", "light"]):
+            department = "Electricity Distribution Company"
+            services = ["electricity complaint office", "electricity service centre", "power substation"]
+        elif any(word in problem for word in ["police", "crime", "theft", "violence", "harassment", "noise", "safety"]):
+            department = "Police Department"
+            services = ["police station", "district police office", "women help desk"]
+        elif any(word in problem for word in ["water", "drain", "garbage", "road", "streetlight", "sewage"]):
+            department = "Municipal Corporation / Local Body"
+            services = ["ward office", "municipal complaint centre", "public works office"]
+        elif any(word in problem for word in ["ration", "pension", "subsidy", "housing", "certificate", "welfare"]):
+            department = "District Administration / Collectorate"
+            services = ["citizen service centre", "tehsil office", "district welfare office"]
+        else:
+            department = "District Administration / Public Grievance Cell"
+            services = ["district grievance office", "citizen service centre", "concerned department office"]
+        return {
+            "department": department,
+            "authority_level": f"Local authority for {request.state}",
+            "service_categories": services,
+            "complaint_guidance": "Open the complaint form for this issue and attach your address, PIN code, and supporting evidence.",
+        }
 
 @router.get("/sessions/history")
 async def get_session_history(current_user: dict = Depends(get_current_user)):
