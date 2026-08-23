@@ -30,27 +30,27 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/platform" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>🤖</span> AI Assistant
+                  AI Assistant
                 </Link>
               </li>
               <li>
                 <Link href="/action-plan" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>⚡</span> Action Plan Builder
+                  Action Plan Builder
                 </Link>
               </li>
               <li>
                 <Link href="/application-generator" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>📄</span> Application Generator
+                  Application Generator
                 </Link>
               </li>
               <li>
                 <Link href="/rights-navigator" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>⚖️</span> Rights Navigator
+                  Rights Navigator
                 </Link>
               </li>
               <li>
                 <Link href="/cases" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>🗂️</span> My Cases Tracker
+                  My Cases Tracker
                 </Link>
               </li>
             </ul>
@@ -64,27 +64,27 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/document-analyzer" className="hover:text-white transition-colors">
-                  🔍 Document Analyzer
+                  Document Analyzer
                 </Link>
               </li>
               <li>
                 <Link href="/scheme-eligibility" className="hover:text-white transition-colors">
-                  📋 Scheme Eligibility
+                  Scheme Eligibility
                 </Link>
               </li>
               <li>
                 <Link href="/authority-finder" className="hover:text-white transition-colors">
-                  🏛️ Authority Finder
+                  Authority Finder
                 </Link>
               </li>
               <li>
                 <Link href="/rti-guide" className="hover:text-white transition-colors">
-                  📜 RTI Citizen Manual
+                  RTI Citizen Manual
                 </Link>
               </li>
               <li>
                 <Link href="/saved-documents" className="hover:text-white transition-colors">
-                  📁 Saved Documents
+                  Saved Documents
                 </Link>
               </li>
             </ul>

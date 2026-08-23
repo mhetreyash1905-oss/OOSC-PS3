@@ -12,6 +12,7 @@ class UserProfileCreate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     gender: Optional[str] = "prefer-not-to-say"
+    phone: Optional[str] = None
 
 
 class UserInDB(BaseModel):
