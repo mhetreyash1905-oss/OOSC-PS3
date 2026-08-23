@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import RefinedProgressBar from '@/components/ui/RefinedProgressBar';
 import Hero from '@/components/ui/Hero';
-import Footer from '@/components/Footer';
 
 interface ActionStep {
   id: number;
